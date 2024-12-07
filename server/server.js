@@ -1,12 +1,21 @@
-require('dotenv').config();  // Load .env file
+// Import dependencies
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
-const User = require('./models/User');  // Import User model
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');  // Import cors
+const User = require('./models/User');
+const Track = require('./models/Track');  // Import User model
+
 const app = express();
 const port = 5000;
 
 // MongoDB URI from .env
 const mongoURI = process.env.MONGO_URI;
+
+// Use the CORS middleware globally
+app.use(cors()); // This will allow requests from any origin (for development purposes)
 
 // Connect to MongoDB Atlas using Mongoose
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -20,24 +29,8 @@ mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 // Middleware to parse JSON request bodies
 app.use(express.json());
 
-// Route to retrieve all users
-app.get('/users', async (req, res) => {
-  try {
-    // Find all users in the database
-    const users = await User.find();
-    res.json(users);  // Send the users as a response
-  } catch (err) {
-    console.error('Error fetching users:', err);
-    res.status(500).json({ message: 'Error retrieving users' });
-  }
-});
-
-// Start the server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
-
-app.post('/users', async (req, res) => {
+// Route to register a new user
+app.post('/register', async (req, res) => {
   const { name, username, email, password } = req.body;
   
   if (!name || !username || !email || !password) {
@@ -45,19 +38,140 @@ app.post('/users', async (req, res) => {
   }
 
   try {
-    // Create a new user document
+    // Check if the user already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ message: 'Email or username already exists' });
+    }
+
+    // Create a new user and save to the database
     const newUser = new User({
       name,
       username,
       email,
-      password  // In a real app, you should hash the password
+      password  // Storing plain password (no hashing)
     });
 
-    // Save the new user to the database
     await newUser.save();
-    res.status(201).json({ message: 'User created successfully', user: newUser });
+    res.status(201).json({ message: 'User registered successfully' });
   } catch (err) {
-    console.error('Error creating user:', err);
-    res.status(500).json({ message: 'Error creating user' });
+    console.error('Error registering user:', err);
+    res.status(500).json({ message: 'Error registering user' });
   }
+});
+
+// Route to login (authenticate) a user
+app.post('/login', async (req, res) => {
+  const { email, password } = req.body;
+  
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email and password are required' });
+  }
+
+  try {
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Compare the entered password with the stored password (plain text comparison)
+    if (user.password !== password) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      { userId: user._id },
+      process.env.JWT_SECRET,  // Secret key for signing the JWT
+      { expiresIn: '1h' }      // Token expiration time (1 hour)
+    );
+
+    res.json({ message: 'Login successful', token });
+  } catch (err) {
+    console.error('Error logging in user:', err);
+    res.status(500).json({ message: 'Error logging in user' });
+  }
+});
+
+// Route to get user information (protected)
+app.get('/user', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];  // Extract the token from the Authorization header
+
+  if (!token) {
+    return res.status(401).json({ message: 'No token provided' });
+  }
+
+  try {
+    // Verify the token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Find the user by ID from the decoded token
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error('Error fetching user info:', err);
+    res.status(500).json({ message: 'Error fetching user data' });
+  }
+});
+
+app.post('/tracks', async (req, res) => {
+  const { artist, track_name, image } = req.body;
+
+  if (!artist || !track_name) {
+    return res.status(400).json({ message: 'Artist and track name are required' });
+  }
+
+  try {
+    const newTrack = new Track({ artist, track_name, image });
+    const savedTrack = await newTrack.save();
+    res.status(201).json(savedTrack);
+  } catch (err) {
+    console.error('Error creating track:', err);
+    res.status(500).json({ message: 'Error creating track' });
+  }
+});
+
+app.get('/tracks', async (req, res) => {
+  try {
+    const tracks = await Track.find();
+    res.json(tracks);
+  } catch (err) {
+    console.error('Error fetching tracks:', err);
+    res.status(500).json({ message: 'Error fetching tracks' });
+  }
+});
+
+
+app.get('/tracks/recent', async (req, res) => {
+  try {
+    const recentTracks = await Track.find().sort({ _id: -1 }).limit(5);
+    res.json(recentTracks);
+  } catch (err) {
+    console.error('Error fetching recent tracks:', err);
+    res.status(500).json({ message: 'Error fetching recent tracks' });
+  }
+});
+
+app.get('/track/:trackId', async (req, res) => {
+  try {
+    const { trackId } = req.params;
+    const track = await Track.findById(trackId);
+    if (!track) {
+      return res.status(404).json({ message: 'Track not found' });
+    }
+    res.json(track);
+  } catch (error) {
+    console.error('Error fetching track:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
 });

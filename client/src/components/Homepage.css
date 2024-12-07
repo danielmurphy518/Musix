@@ -1,0 +1,50 @@
+/* Main homepage container */
+.homepage-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+}
+
+/* Grid layout for boxes */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 evenly spaced columns */
+  gap: 20px; /* Space between the boxes */
+  width: 100%;
+  justify-items: center;
+}
+
+/* Individual box styles */
+.grid-box {
+  width: 156px; /* Match image width */
+  height: 231px; /* Match image height */
+  background-color: #b2a17f;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.grid-box:hover {
+  background-color: #4c3f2a;
+  transform: scale(1.05);
+}
+
+/* Image styling */
+.track-image {
+  width: 156px; /* Fixed width */
+  height: 231px; /* Fixed height */
+  object-fit: cover; /* Ensures the image fits without distortion */
+  border-radius: 4px; /* Slight rounding for aesthetics */
+}
+
+/* Placeholder text for missing images */
+.placeholder {
+  color: white;
+  font-size: 14px;
+  text-align: center;
+}
