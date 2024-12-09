@@ -56,4 +56,34 @@ export const fetchTrackById = async (trackId) => {
     }
   };
 
+  export const fetchReviewsByTrackId= async (trackId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/reviews/track/${trackId}`);
+      console.log(response)
+      if (!response.ok) {
+        throw new Error('Track not found');
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error('Error fetching track by ID:', err);
+      return null;
+    }
+  };
+
+  export const fetchUserspage = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/user/${userId}`);
+      console.log(response)
+      if (!response.ok) {
+        throw new Error('Track not found');
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error('Error fetching track by ID:', err);
+      return null;
+    }
+  };
+
   

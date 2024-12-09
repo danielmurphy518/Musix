@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import Login from './components/Login';
 import Homepage from './components/Homepage';
 import TrackPage from './components/Trackpage'; // Import the TrackPage component
+import UserPage from './components/Userpage';
 import './App.css';
 
 const App = () => {
@@ -45,7 +46,7 @@ const App = () => {
     <Router>
       <div>
         <header className="app-header">
-          <h1 className="app-title">Daniel's App</h1>
+          <h1 className="app-title">App name goes here once I think of it</h1>
           <div className="header-buttons">
             {user ? (
               <button className="logout-button" onClick={handleLogout}>
@@ -64,6 +65,7 @@ const App = () => {
             <Route path="/" element={<Homepage />} />
             <Route path="/tracks" element={<Homepage />} /> {/* Home page or a tracks list page */}
             <Route path="/track/:trackId" element={<TrackPage />} /> {/* Specific track page */}
+            <Route path="/user/:userId" element={<UserPage />} /> {/* Specific track page */}
           </Routes>
         </div>
       </div>

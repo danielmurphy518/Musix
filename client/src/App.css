@@ -2,8 +2,8 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #eae4db; /* Soft, light beige earth tone */
-  color: #4c3f2a; /* Matches header text */
+  background-color: #2f2f2f; /* Soft, light beige earth tone */
+  color: #f5f5f5; /* Matches header text */
 }
 
 /* Header styles */

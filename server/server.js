@@ -7,6 +7,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');  // Import cors
 const User = require('./models/User');
 const Track = require('./models/Track');  // Import User model
+const Review = require('./models/Review');
 
 const app = express();
 const port = 5000;
@@ -170,6 +171,83 @@ app.get('/track/:trackId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
+
+app.post('/reviews', async (req, res) => {
+  const { userId, trackId, content, rating } = req.body;
+
+  if (!userId || !trackId || !content || !rating) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  try {
+    const newReview = new Review({
+      user: userId,
+      track: trackId,
+      content,
+      rating,
+    });
+
+    const savedReview = await newReview.save();
+    res.status(201).json(savedReview);
+  } catch (err) {
+    console.error('Error creating review:', err);
+    res.status(500).json({ message: 'Error creating review' });
+  }
+});
+
+app.get('/reviews/user/:userId', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const userReviews = await Review.find({ user: userId })
+      .populate('track', 'track_name artist') // Populate track details
+      .populate('user', 'username'); // Populate user details
+    res.json(userReviews);
+  } catch (err) {
+    console.error('Error fetching user reviews:', err);
+    res.status(500).json({ message: 'Error fetching user reviews' });
+  }
+});
+
+// Route to fetch reviews for a specific track
+app.get('/reviews/track/:trackId', async (req, res) => {
+  try {
+    const { trackId } = req.params;
+    const trackReviews = await Review.find({ track: trackId })
+      .populate('track', 'track_name artist id') // Populate track details
+      .populate('user', 'username name'); // Populate user details
+    res.json(trackReviews);
+  } catch (err) {
+    console.error('Error fetching track reviews:', err);
+    res.status(500).json({ message: 'Error fetching track reviews' });
+  }
+});
+
+app.get('/user/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    // Find the user by their ID and select only the fields we want (name, username)
+    const user = await User.findById(userId).select('name username');
+    
+    // If no user is found, return a 404 response
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Fetch reviews for this user and populate the associated track data
+    const reviews = await Review.find({ user: userId })
+      .populate('track', 'track_name artist') // Only fetch track_name and artist from Track
+      .select('content rating'); // Fetch only review content and rating
+
+    // Return user data along with reviews
+    res.json({ user, reviews });
+  } catch (err) {
+    console.error('Error fetching user by ID with reviews:', err);
+    res.status(500).json({ message: 'Error fetching user and reviews' });
+  }
+});
+
+
 
 // Start the server
 app.listen(port, () => {
