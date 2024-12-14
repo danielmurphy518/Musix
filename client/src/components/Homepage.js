@@ -7,8 +7,13 @@ const Homepage = () => {
   useEffect(() => {
     const fetchTracks = async () => {
       try {
-        const apiUrl = process.env.REACT_APP_API_URL; // Get the API URL from the environment variable
-        const response = await fetch(`${apiUrl}/tracks/recent`);
+        const response = await fetch("https://2cdd-2403-4800-25ad-7c01-41e4-11c0-d683-3c2b.ngrok-free.app/tracks/recent", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true", // Add this custom header
+          },
+        });
         const data = await response.json();
         setTracks(data);
       } catch (error) {

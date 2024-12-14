@@ -15,8 +15,17 @@ const port = 5000;
 // MongoDB URI from .env
 const mongoURI = process.env.MONGO_URI;
 
-// Use the CORS middleware globally
-app.use(cors()); // This will allow requests from any origin (for development purposes)
+// CORS options
+
+const corsOptions = {
+  origin: '*', // Allow all origins temporarily for debugging
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
+
 
 // Connect to MongoDB Atlas using Mongoose
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -147,7 +156,6 @@ app.get('/tracks', async (req, res) => {
   }
 });
 
-
 app.get('/tracks/recent', async (req, res) => {
   try {
     const recentTracks = await Track.find().sort({ _id: -1 }).limit(5);
@@ -246,8 +254,6 @@ app.get('/user/:userId', async (req, res) => {
     res.status(500).json({ message: 'Error fetching user and reviews' });
   }
 });
-
-
 
 // Start the server
 app.listen(port, () => {
