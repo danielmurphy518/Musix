@@ -7,7 +7,7 @@ const Homepage = () => {
   useEffect(() => {
     const fetchTracks = async () => {
       try {
-        const response = await fetch("http://localhost:5000/tracks/recent");
+        const response = await fetch(`${apiUrl}/tracks/recent`);
         const data = await response.json();
         setTracks(data);
       } catch (error) {
