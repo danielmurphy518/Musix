@@ -7,6 +7,7 @@ const Homepage = () => {
   useEffect(() => {
     const fetchTracks = async () => {
       try {
+        const apiUrl = process.env.REACT_APP_API_URL; // Get the API URL from the environment variable
         const response = await fetch(`${apiUrl}/tracks/recent`);
         const data = await response.json();
         setTracks(data);
