@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./components/Login";
+import Signup from "./components/Signup";
 import Homepage from "./components/Homepage";
 import TrackPage from "./components/Trackpage";
 import UserPage from "./components/Userpage";
 import PasswordPrompt from "./components/PasswordPrompt";
+import AuthProvider from "./hooks/AuthProvider";
 import "./App.css";
 
 const App = () => {
@@ -12,6 +14,7 @@ const App = () => {
     const [accessGranted, setAccessGranted] = useState(
         localStorage.getItem("accessGranted") === "true"
     );
+
 
     useEffect(() => {
         const token = localStorage.getItem("token");
@@ -50,6 +53,7 @@ const App = () => {
     }
 
     return (
+        <AuthProvider>
         <Router>
             <div>
                 <header className="app-header">
@@ -75,10 +79,13 @@ const App = () => {
                         <Route path="/tracks" element={<Homepage />} />
                         <Route path="/track/:trackId" element={<TrackPage />} />
                         <Route path="/user/:userId" element={<UserPage />} />
+                        <Route path="/login" element={<Login />} />
+                        <Route path="/signup" element={<Signup />} />
                     </Routes>
                 </div>
             </div>
         </Router>
+        </AuthProvider>
     );
 };
 

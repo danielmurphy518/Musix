@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from "react";
 import "./Homepage.css";
+import { fetchRecentTracks, fetchUserInformation} from '../api';
+
 
 const Homepage = () => {
   const [tracks, setTracks] = useState([]);
 
   useEffect(() => {
-    const fetchTracks = async () => {
+    const fetchRecents = async () => {
       try {
-        const response = await fetch("https://2cdd-2403-4800-25ad-7c01-41e4-11c0-d683-3c2b.ngrok-free.app/tracks/recent", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true", // Add this custom header
-          },
-        });
-        const data = await response.json();
-        setTracks(data);
+        const [trackData, userData] = await Promise.all([
+          fetchRecentTracks(),
+          fetchUserInformation()
+        ]);
+        console.log(userData)
+        if (trackData) setTracks(trackData);
       } catch (error) {
-        console.error("Error fetching tracks:", error);
+        console.error('Error fetching track or reviews:', error);
       }
     };
 
-    fetchTracks();
+    fetchRecents();
   }, []);
 
   return (

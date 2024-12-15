@@ -22,6 +22,7 @@ const Login = ({ setUser }) => {
     if (response.ok) {
       // Store token in localStorage
       localStorage.setItem('token', data.token);
+      console.log(data)
       setUser(data); // Set user data (if you have it)
     } else {
       console.error('Login failed:', data.message);

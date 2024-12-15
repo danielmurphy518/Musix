@@ -3,6 +3,7 @@ const API_URL = 'http://localhost:5000'; // Make sure this matches your backend 
 
 // Register user
 export const registerUser = async (userData) => {
+  console.log(userData)
   const response = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
@@ -86,4 +87,16 @@ export const fetchTrackById = async (trackId) => {
     }
   };
 
+  export const fetchUserInformation = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/user/`);
+      console.log(response)
+
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error('Error fetching track by ID:', err);
+      return null;
+    }
+  };
   
