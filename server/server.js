@@ -53,13 +53,13 @@ app.post('/register', async (req, res) => {
     if (existingUser) {
       return res.status(400).json({ message: 'Email or username already exists' });
     }
-
+    let hashedpass = await bcrypt.hash(password, 10);
     // Create a new user and save to the database
     const newUser = new User({
       name,
       username,
       email,
-      password  // Storing plain password (no hashing)
+      password: hashedpass  // Storing plain password (no hashing)
     });
 
     await newUser.save();
@@ -73,7 +73,7 @@ app.post('/register', async (req, res) => {
 // Route to login (authenticate) a user
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  
+  console.log(password)
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
@@ -81,12 +81,16 @@ app.post('/login', async (req, res) => {
   try {
     // Find user by email
     const user = await User.findOne({ email });
+    console.log(user)
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+    console.log(password, user.password)
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    console.log(passwordMatch)
 
     // Compare the entered password with the stored password (plain text comparison)
-    if (user.password !== password) {
+    if (!passwordMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -121,6 +125,8 @@ app.get('/user', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
+
+    console.log(user)
 
     res.json(user);
   } catch (err) {

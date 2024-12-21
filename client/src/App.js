@@ -30,7 +30,7 @@ const App = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
+            //console.log(response)
             const data = await response.json();
             setUser(data);
         } catch (error) {
