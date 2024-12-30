@@ -68,7 +68,7 @@ const App = () => {
             <Router>
                 <div>
                     <header className="app-header">
-                        <h1 className="app-title">Welcome: you are: {user ? user.name : 'Guest'}</h1>
+                        <h1 className="app-title">Welcome: you are!!!: {user ? user.name : 'Guest'}</h1>
                         <div className="header-buttons">
                             {user ? (
                                 <button className="logout-button" onClick={handleLogout}>
