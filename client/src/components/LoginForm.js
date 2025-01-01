@@ -1,13 +1,14 @@
-// src/components/LoginForm.js
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import { UserContext } from '../UserContext'; // Import the context
 
-const LoginForm = ({ setUser, closeModal }) => {
+const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { login } = useContext(UserContext); // Access the login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch('http://localhost:5000/login', {
         method: 'POST',
@@ -16,21 +17,18 @@ const LoginForm = ({ setUser, closeModal }) => {
         },
         body: JSON.stringify({ email, password }),
       });
-  
-      // Check if the response is okay (status 200)
+
       if (!response.ok) {
         throw new Error('Login failed');
       }
-  
-      const data = await response.json(); // Parse the JSON response
-      console.log('Parsed Data:', data);
-  
-      // Assuming server sends { message, token }
+
+      const data = await response.json();
+      console.log(data)
       if (data.token) {
-        console.log(data.token)
-        localStorage.setItem('token', data.token); // Store token in localStorage
-        setUser(data.user);  // Ensure user data is included in response
-        closeModal(); // Close modal after successful login
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('userId', data.userId);
+        login(data.user); // Update context with the logged-in user's info
+        closeModal();
       } else {
         console.error('Login failed:', data.message);
       }
@@ -38,17 +36,17 @@ const LoginForm = ({ setUser, closeModal }) => {
       console.error('Error during login:', err);
     }
   };
-  
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
+    <form onSubmit={handleSubmit} style={formStyles}>
+      <h2 style={headingStyles}>Login</h2>
       <input
         type="email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
         required
+        style={inputStyles}
       />
       <input
         type="password"
@@ -56,10 +54,44 @@ const LoginForm = ({ setUser, closeModal }) => {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         required
+        style={inputStyles}
       />
-      <button type="submit">Login</button>
+      <button type="submit" style={buttonStyles}>Login</button>
     </form>
   );
+};
+
+const formStyles = {
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: '16px',
+  padding: '20px',
+};
+
+const headingStyles = {
+  color: '#333',
+  marginBottom: '16px',
+  textAlign: 'center',
+};
+
+const inputStyles = {
+  width: '100%',
+  maxWidth: '300px',
+  padding: '10px',
+  marginBottom: '16px',
+  border: '1px solid #ccc',
+  borderRadius: '4px',
+};
+
+const buttonStyles = {
+  padding: '10px 20px',
+  backgroundColor: '#007BFF',
+  color: '#fff',
+  border: 'none',
+  borderRadius: '4px',
+  cursor: 'pointer',
+  transition: 'background-color 0.3s',
 };
 
 export default LoginForm;

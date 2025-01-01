@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Homepage from "./components/Homepage";
@@ -8,47 +8,46 @@ import UserPage from "./components/Userpage";
 import PasswordPrompt from "./components/PasswordPrompt";
 import LoginForm from "./components/LoginForm";
 import Modal from "./components/Modal";
-import AuthProvider from "./hooks/AuthProvider";
+import ResponsiveAppBar from "./components/ResponsiveAppBar";
 import "./App.css";
+import { UserProvider } from "./UserContext";
+
 
 const App = () => {
-    const [user, setUser] = useState(null);
+    // const [user, setUser] = useState(null);
     const [accessGranted, setAccessGranted] = useState(
         localStorage.getItem("accessGranted") === "true"
     );
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-        if (token) {
-            getUserInfo(token);
-        }
-    }, []);
+    // useEffect(() => {
+    //     const token = localStorage.getItem("token");
+    //     if (token) {
+    //         getUserInfo(token);
+    //     }
+    // }, []);
 
-    const getUserInfo = async (token) => {
-        try {
-            const response = await fetch("http://localhost:5000/user", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            const data = await response.json();
-            console.log(data)
-            setUser(data);
-        } catch (error) {
-            //console.error("Error fetching user data:", error);
-        }
-    };
+    // const getUserInfo = async (token) => {
+    //     try {
+    //         const response = await fetch("http://localhost:5000/user", {
+    //             headers: {
+    //                 Authorization: `Bearer ${token}`,
+    //             },
+    //         });
+    //         const data = await response.json();
+    //         setUser(data);
+    //     } catch (error) {
+    //         console.error("Error fetching user data:", error);
+    //     }
+    // };
 
     const handleLogin = (token) => {
-        // localStorage.setItem("token", token);
-        // getUserInfo(token);
-        setIsLoginModalOpen(false); // Close the modal on successful login
+        localStorage.setItem("token", token);
+        setIsLoginModalOpen(false);
     };
 
     const handleLogout = () => {
         localStorage.removeItem("token");
-        setUser(null);
     };
 
     const openLoginModal = () => {
@@ -64,26 +63,15 @@ const App = () => {
     }
 
     return (
-        // <AuthProvider>
+        <UserProvider>
             <Router>
                 <div>
-                    <header className="app-header">
-                        <h1 className="app-title">Welcome: you are!!: {user ? user.name : 'Guest'}</h1>
-                        <div className="header-buttons">
-                            {user ? (
-                                <button className="logout-button" onClick={handleLogout}>
-                                    Logout
-                                </button>
-                            ) : (
-                                <button
-                                    className="login-button"
-                                    onClick={openLoginModal}
-                                >
-                                    Login/Sign Up
-                                </button>
-                            )}
-                        </div>
-                    </header>
+                    {/* Pass user and openLoginModal to ResponsiveAppBar */}
+                    <ResponsiveAppBar
+                        
+                        handleLogout={handleLogout}
+                        openLoginModal={openLoginModal}
+                    />
                     <div className="content-wrapper">
                         <Routes>
                             <Route path="/" element={<Homepage />} />
@@ -94,12 +82,13 @@ const App = () => {
                             <Route path="/signup" element={<Signup />} />
                         </Routes>
                     </div>
+                    {/* Login Modal */}
                     <Modal isOpen={isLoginModalOpen} closeModal={closeLoginModal}>
-                        <LoginForm setUser={handleLogin} closeModal={closeLoginModal} />
+                        <LoginForm closeModal={closeLoginModal} />
                     </Modal>
                 </div>
             </Router>
-        // </AuthProvider>
+        </UserProvider>
     );
 };
 

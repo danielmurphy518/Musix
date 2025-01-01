@@ -1,19 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import "./Homepage.css";
-import { fetchRecentTracks, fetchUserInformation} from '../api';
-
+import { fetchRecentTracks, fetchUserInformation } from '../api';
+import { UserContext } from '../UserContext';
 
 const Homepage = () => {
   const [tracks, setTracks] = useState([]);
+
+  const { user, login, logout } = useContext(UserContext);
 
   useEffect(() => {
     const fetchRecents = async () => {
       try {
         const [trackData, userData] = await Promise.all([
           fetchRecentTracks(),
-          fetchUserInformation()
         ]);
-        console.log(userData)
         if (trackData) setTracks(trackData);
       } catch (error) {
         console.error('Error fetching track or reviews:', error);
@@ -26,10 +27,16 @@ const Homepage = () => {
   return (
     <div className="content-wrapper">
       <div className="homepage-container">
+        {user && (
+          <div className="welcome-box">
+            Welcome, {user.name}
+          </div>
+        )}
         <div className="grid-container">
           {tracks.map((track, index) => (
             <div key={track._id || index} className="grid-box">
-              <a href={`/track/${track._id}`}>
+              {/* Use Link instead of href */}
+              <Link to={`/track/${track._id}`}>
                 {track.image ? (
                   <img
                     src={track.image}
@@ -39,7 +46,7 @@ const Homepage = () => {
                 ) : (
                   <div className="placeholder">No Image</div>
                 )}
-              </a>
+              </Link>
             </div>
           ))}
         </div>
