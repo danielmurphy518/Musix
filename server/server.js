@@ -100,17 +100,23 @@ app.post('/login', async (req, res) => {
       { expiresIn: '1h' }      // Token expiration time (1 hour)
     );
 
-    // Return the userId and token
+    // Return the token along with user details
     res.json({
       message: 'Login successful',
       token,
-      userId: user._id // Include the userId in the response
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email
+      }
     });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ message: 'Error logging in user' });
   }
 });
+
 
 
 // Route to get user information (protected)
