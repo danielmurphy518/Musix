@@ -73,7 +73,7 @@ app.post('/register', async (req, res) => {
 // Route to login (authenticate) a user
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log(password)
+
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
@@ -81,31 +81,37 @@ app.post('/login', async (req, res) => {
   try {
     // Find user by email
     const user = await User.findOne({ email });
-    console.log(user)
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    // Compare the entered password with the stored password (hashed)
     const passwordMatch = await bcrypt.compare(password, user.password);
 
-    // Compare the entered password with the stored password (plain text comparison)
     if (!passwordMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    //Generate a JWT
+    // Generate a JWT token
     const token = jwt.sign(
       { userId: user._id },
       process.env.JWT_SECRET,  // Secret key for signing the JWT
       { expiresIn: '1h' }      // Token expiration time (1 hour)
     );
 
-    console.log('Server Response:', { message: 'Login successful', token });
-    res.json({ message: 'Login successful', token  });
+    // Return the userId and token
+    res.json({
+      message: 'Login successful',
+      token,
+      userId: user._id // Include the userId in the response
+    });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ message: 'Error logging in user' });
   }
 });
+
 
 // Route to get user information (protected)
 app.get('/user', async (req, res) => {
