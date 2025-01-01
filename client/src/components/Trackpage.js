@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchTrackById, fetchReviewsByTrackId, submitReview } from '../api';
-import Modal from './Modal';
-import Rating from '@mui/material/Rating'; // Import Material-UI Rating
+import ReviewModal from './ReviewModal';
+import Rating from '@mui/material/Rating';
 import './Trackpage.css';
+import { UserContext } from '../UserContext';
 
 const TrackPage = () => {
   const { trackId } = useParams();
@@ -13,6 +14,8 @@ const TrackPage = () => {
   const [rating, setRating] = useState(0);
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const fetchTrackAndReviews = async () => {
@@ -42,11 +45,11 @@ const TrackPage = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await submitReview(trackId, reviewContent, rating);
+      const response = await submitReview(trackId, reviewContent, rating, user);
       if (response) {
         setReviews((prevReviews) => [
           ...prevReviews,
-          { content: reviewContent, rating, user: { name: 'Current User' } },
+          { content: reviewContent, rating, user: { name: user.name } },
         ]);
         setReviewContent('');
         setRating(0);
@@ -61,13 +64,8 @@ const TrackPage = () => {
     }
   };
 
-  const openReviewModal = () => {
-    setIsReviewModalOpen(true);
-  };
-
-  const closeReviewModal = () => {
-    setIsReviewModalOpen(false);
-  };
+  const openReviewModal = () => setIsReviewModalOpen(true);
+  const closeReviewModal = () => setIsReviewModalOpen(false);
 
   if (!track) {
     return <div>Loading...</div>;
@@ -106,27 +104,16 @@ const TrackPage = () => {
         </button>
       </div>
 
-      {/* Review Modal */}
-      <Modal isOpen={isReviewModalOpen} closeModal={closeReviewModal}>
-        <form onSubmit={handleReviewSubmit} className="review-form">
-          <h2>Add a Review</h2>
-          <Rating
-            name="review-rating"
-            value={rating}
-            onChange={(event, newValue) => setRating(newValue)}
-            precision={0.5}
-          />
-          <textarea
-            value={reviewContent}
-            onChange={(e) => setReviewContent(e.target.value)}
-            placeholder="Write your review here"
-            required
-          />
-          <button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? 'Submitting...' : 'Submit Review'}
-          </button>
-        </form>
-      </Modal>
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        closeModal={closeReviewModal}
+        rating={rating}
+        setRating={setRating}
+        reviewContent={reviewContent}
+        setReviewContent={setReviewContent}
+        handleReviewSubmit={handleReviewSubmit}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };

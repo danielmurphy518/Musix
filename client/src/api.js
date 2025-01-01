@@ -101,10 +101,10 @@ export const fetchTrackById = async (trackId) => {
   };
   
 
-  export const submitReview = async (trackId, content, rating) => {
-    const userId = localStorage.getItem('userId'); // Assuming you store userId in localStorage
+  export const submitReview = async (trackId, content, rating, user) => {
+    const userId = user.id; // Assuming you store userId in localStorage
     const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
-  
+    console.log(user)
     if (!userId || !token) {
       throw new Error('User is not authenticated');
     }

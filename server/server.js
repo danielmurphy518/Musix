@@ -199,7 +199,7 @@ app.get('/track/:trackId', async (req, res) => {
 
 app.post('/reviews', async (req, res) => {
   const { userId, trackId, content, rating } = req.body;
-
+  
   if (!userId || !trackId || !content || !rating) {
     return res.status(400).json({ message: 'All fields are required' });
   }
@@ -269,6 +269,18 @@ app.get('/user/:userId', async (req, res) => {
   } catch (err) {
     console.error('Error fetching user by ID with reviews:', err);
     res.status(500).json({ message: 'Error fetching user and reviews' });
+  }
+});
+
+//this is extremely dangerous and should never be used, ever.
+app.delete('/reviews', async (req, res) => {
+  try {
+    // Delete all reviews
+    await Review.deleteMany({});
+    res.status(200).json({ message: 'All reviews have been cleared' });
+  } catch (err) {
+    console.error('Error clearing reviews:', err);
+    res.status(500).json({ message: 'Error clearing reviews' });
   }
 });
 
