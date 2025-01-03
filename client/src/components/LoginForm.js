@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../UserContext'; // Import the context
+import { loginUser } from '../api'; // Import the loginUser function from api.js
 
 const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
@@ -10,20 +11,8 @@ const LoginForm = ({ closeModal }) => {
     e.preventDefault();
 
     try {
-      const response = await fetch('http://localhost:5000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
+      const data = await loginUser({ email, password }); // Use the loginUser function from api.js
 
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      const data = await response.json();
-      console.log(data)
       if (data.token) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userId', data.userId);
