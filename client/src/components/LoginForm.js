@@ -59,7 +59,7 @@ const formStyles = {
 };
 
 const headingStyles = {
-  color: '#333',
+  color: '#F0F0F0',
   marginBottom: '16px',
   textAlign: 'center',
 };

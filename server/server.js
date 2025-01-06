@@ -284,6 +284,52 @@ app.delete('/reviews', async (req, res) => {
   }
 });
 
+app.delete('/review/:reviewId', async (req, res) => {
+  const { reviewId } = req.params;
+
+  try {
+    const deletedReview = await Review.findByIdAndDelete(reviewId);
+
+    if (!deletedReview) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    res.status(200).json({ message: 'Review deleted successfully', review: deletedReview });
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    res.status(500).json({ message: 'Error deleting review' });
+  }
+});
+
+app.patch('/reviews/:reviewId', async (req, res) => {
+  const { reviewId } = req.params;
+  const { content, rating } = req.body;
+
+  if (!content && rating === undefined) {
+    return res.status(400).json({ message: 'Content or rating is required to update the review' });
+  }
+
+  try {
+    const review = await Review.findById(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+    if (content) review.content = content;
+    if (rating !== undefined) review.rating = rating;
+
+    const updatedReview = await review.save();
+
+    res.status(200).json({
+      message: 'Review updated successfully',
+      review: updatedReview
+    });
+  } catch (err) {
+    console.error('Error updating review:', err);
+    res.status(500).json({ message: 'Error updating review' });
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
