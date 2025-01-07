@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, { useContext } from "react";
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -12,13 +12,17 @@ import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import PersonIcon from '@mui/icons-material/Person';
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
+import { UserContext } from '../UserContext';
 
 const pages = ['Tracks', 'Members'];
 
 function ResponsiveAppBar({ openLoginModal }) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
+
+  // Get user from context
+  const { user } = useContext(UserContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -57,22 +61,22 @@ function ResponsiveAppBar({ openLoginModal }) {
           <Toolbar disableGutters>
             <MusicNoteIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
             <Typography
-  variant="h6"
-  noWrap
-  component={Link}
-  to="/"
-  sx={{
-    mr: 2,
-    display: { xs: 'none', md: 'flex' },
-    fontFamily: 'monospace',
-    fontWeight: 700,
-    letterSpacing: '.3rem',
-    color: 'inherit',
-    textDecoration: 'none',
-  }}
->
-  Music Social
-</Typography>
+              variant="h6"
+              noWrap
+              component={Link}
+              to="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'none', md: 'flex' },
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              Music Social
+            </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
               <IconButton
@@ -108,25 +112,26 @@ function ResponsiveAppBar({ openLoginModal }) {
                 ))}
               </Menu>
             </Box>
+
             <MusicNoteIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
             <Typography
-  variant="h5"
-  noWrap
-  component={Link}
-  to="/"
-  sx={{
-    mr: 2,
-    display: { xs: 'flex', md: 'none' },
-    flexGrow: 1,
-    fontFamily: 'monospace',
-    fontWeight: 700,
-    letterSpacing: '.3rem',
-    color: 'inherit',
-    textDecoration: 'none',
-  }}
->
-  MSOCIAL
-</Typography>
+              variant="h5"
+              noWrap
+              component={Link}
+              to="/"
+              sx={{
+                mr: 2,
+                display: { xs: 'flex', md: 'none' },
+                flexGrow: 1,
+                fontFamily: 'monospace',
+                fontWeight: 700,
+                letterSpacing: '.3rem',
+                color: 'inherit',
+                textDecoration: 'none',
+              }}
+            >
+              MSOCIAL
+            </Typography>
 
             <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
               {pages.map((page) => (
@@ -139,12 +144,15 @@ function ResponsiveAppBar({ openLoginModal }) {
                 </Button>
               ))}
             </Box>
+
+            {/* User Menu */}
             <Box sx={{ flexGrow: 0 }}>
-              <Tooltip title="Open settings">
+              
                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                   <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
                 </IconButton>
-              </Tooltip>
+              
+
               <Menu
                 sx={{ mt: '45px' }}
                 id="menu-appbar"
@@ -161,17 +169,25 @@ function ResponsiveAppBar({ openLoginModal }) {
                 open={Boolean(anchorElUser)}
                 onClose={handleCloseUserMenu}
               >
-                <MenuItem onClick={handleCloseUserMenu}>
-                  <Typography textAlign="center">Profile</Typography>
-                </MenuItem>
-                <MenuItem
-                  onClick={() => {
-                    openLoginModal();
-                    handleCloseUserMenu();
-                  }}
-                >
-                  <Typography textAlign="center">Login</Typography>
-                </MenuItem>
+                {/* Show Profile if logged in, otherwise show Login */}
+                {user ? (
+                  <MenuItem
+                    component={Link}
+                    to={`/user/${user.id}`}
+                    onClick={handleCloseUserMenu}
+                  >
+                    <Typography textAlign="center">Profile</Typography>
+                  </MenuItem>
+                ) : (
+                  <MenuItem
+                    onClick={() => {
+                      openLoginModal(); // Open Login Modal if no user is logged in
+                      handleCloseUserMenu();
+                    }}
+                  >
+                    <Typography textAlign="center">Login</Typography>
+                  </MenuItem>
+                )}
               </Menu>
             </Box>
           </Toolbar>

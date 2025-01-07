@@ -14,7 +14,11 @@ const Modal = ({ isOpen, closeModal, children }) => {
           borderRadius: '12px',
           padding: '16px',
           boxShadow: '0px 8px 16px rgba(0, 0, 0, 0.4)',
-          maxWidth: '600px',
+          maxWidth: '600px',  // Max width of the modal
+          width: '100%',      // Full width within the maxWidth limit
+          height: 'auto',     // Adjust height based on content
+          minHeight: '300px', // Minimum height to avoid collapsing
+          overflow: 'hidden', // Prevent the modal itself from scrolling
         },
       }}
     >
@@ -22,6 +26,9 @@ const Modal = ({ isOpen, closeModal, children }) => {
         sx={{
           paddingTop: '16px',
           paddingBottom: '16px',
+          maxHeight: '80vh',   // Max content height to prevent overflowing
+          overflowY: 'auto',   // Allow scroll only inside content if needed
+          paddingRight: '0',   // Fixes potential right side padding causing extra space
         }}
       >
         <IconButton

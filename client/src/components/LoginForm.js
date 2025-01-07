@@ -5,10 +5,12 @@ import { loginUser } from '../api'; // Import the loginUser function from api.js
 const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState(''); // State for handling errors
   const { login } = useContext(UserContext); // Access the login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Reset the error before each login attempt
 
     try {
       const data = await loginUser({ email, password }); // Use the loginUser function from api.js
@@ -19,10 +21,11 @@ const LoginForm = ({ closeModal }) => {
         login(data.user); // Update context with the logged-in user's info
         closeModal();
       } else {
-        console.error('Login failed:', data.message);
+        setError(data.message || 'Login failed. Please check your credentials.'); // Set error message
       }
     } catch (err) {
       console.error('Error during login:', err);
+      setError('An error occurred. Please try again later.');
     }
   };
 
@@ -45,6 +48,19 @@ const LoginForm = ({ closeModal }) => {
         required
         style={inputStyles}
       />
+      
+      {/* Conditionally display error message with inline styling */}
+      {error && (
+        <h3 style={{ 
+          color: 'red', 
+          fontSize: '14px', 
+          textAlign: 'center', 
+          marginBottom: '16px' 
+        }}>
+          {error}
+        </h3>
+      )}
+
       <button type="submit" style={buttonStyles}>Login</button>
     </form>
   );

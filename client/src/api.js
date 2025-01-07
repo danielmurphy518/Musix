@@ -2,7 +2,6 @@ const API_URL = 'http://localhost:4000'; // Make sure this matches your backend 
 
 // Register user
 export const registerUser = async (userData) => {
-  console.log(userData)
   const response = await fetch(`${API_URL}/register`, {
     method: 'POST',
     headers: {
@@ -43,7 +42,6 @@ export const fetchRecentTracks = async () => {
 export const fetchTrackById = async (trackId) => {
     try {
       const response = await fetch(`${API_URL}/track/${trackId}`);
-      console.log(response)
       if (!response.ok) {
         throw new Error('Track not found');
       }
@@ -58,7 +56,6 @@ export const fetchTrackById = async (trackId) => {
 export const fetchReviewsByTrackId = async (trackId) => {
     try {
       const response = await fetch(`${API_URL}/reviews/track/${trackId}`);
-      console.log(response)
       if (!response.ok) {
         throw new Error('Track not found');
       }
@@ -73,7 +70,6 @@ export const fetchReviewsByTrackId = async (trackId) => {
 export const fetchUserspage = async (userId) => {
     try {
       const response = await fetch(`${API_URL}/user/${userId}`);
-      console.log(response)
       if (!response.ok) {
         throw new Error('Track not found');
       }
@@ -88,7 +84,6 @@ export const fetchUserspage = async (userId) => {
 export const fetchUserInformation = async () => {
     try {
       const response = await fetch(`${API_URL}/user/`);
-      console.log(response)
 
       const data = await response.json();
       return data;
@@ -101,7 +96,6 @@ export const fetchUserInformation = async () => {
 export const submitReview = async (trackId, content, rating, user) => {
   const userId = user.id; // Assuming you store userId in localStorage
   const token = localStorage.getItem('token'); // Assuming you store the token in localStorage
-  console.log(user)
   if (!userId || !token) {
     throw new Error('User is not authenticated');
   }

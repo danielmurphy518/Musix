@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { fetchUserspage } from '../api';
-import './Userpage.css'; // Adjusted filename for consistency
+import Rating from '@mui/material/Rating'; // Import the Rating component
+import './Userpage.css';
 
 const UserPage = () => {
-  const { userId } = useParams(); // Get userId from URL params
+  const { userId } = useParams();
   const [user, setUser] = useState(null);
   const [reviews, setReviews] = useState([]);
 
@@ -14,8 +15,8 @@ const UserPage = () => {
         const data = await fetchUserspage(userId);
 
         if (data) {
-          setUser(data.user); // Set user details
-          setReviews(data.reviews); // Set user reviews
+          setUser(data.user); 
+          setReviews(data.reviews); 
         }
       } catch (error) {
         console.error('Error fetching user or reviews:', error);
@@ -24,20 +25,6 @@ const UserPage = () => {
 
     fetchUserAndReviews();
   }, [userId]);
-
-  // Function to display stars based on the rating
-  const renderStars = (rating) => {
-    const totalStars = 5;
-    const filledStars = Math.floor(rating); // Full stars
-    const hasHalfStar = rating % 1 >= 0.5; // Half star
-    const emptyStars = totalStars - filledStars - (hasHalfStar ? 1 : 0); // Empty stars
-
-    return Array.from({ length: totalStars }, (_, index) => {
-      if (index < filledStars) return <span key={index} className="filled">★</span>;
-      if (index === filledStars && hasHalfStar) return <span key={index} className="half-filled">½</span>;
-      return <span key={index} className="empty">☆</span>;
-    });
-  };
 
   if (!user) {
     return <div>Loading user details...</div>;
@@ -60,7 +47,14 @@ const UserPage = () => {
                 <strong>Review:</strong> {review.content}
               </p>
               <div className="review-rating">
-                {renderStars(review.rating)}
+                {/* Using Material UI Rating Component */}
+                <Rating 
+                  name="read-only" 
+                  value={review.rating} 
+                  readOnly 
+                  precision={0.5} 
+                  size="large"
+                />
               </div>
             </div>
           ))
