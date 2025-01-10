@@ -14,10 +14,11 @@ const LoginForm = ({ closeModal }) => {
 
     try {
       const data = await loginUser({ email, password }); // Use the loginUser function from api.js
-
+      //console.log(data)
       if (data.token) {
+        console.log(data.token)
         localStorage.setItem('token', data.token);
-        localStorage.setItem('userId', data.userId);
+        //localStorage.setItem('userId', data.userId);
         login(data.user); // Update context with the logged-in user's info
         closeModal();
       } else {

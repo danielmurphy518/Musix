@@ -121,10 +121,12 @@ app.post('/login', async (req, res) => {
 
 // Route to get user information (protected)
 app.get('/user', async (req, res) => {
+  console.log("working?")
   const token = req.headers.authorization?.split(' ')[1];  // Extract the token from the Authorization header
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    console.log("return")
+    return res.json(null);  // Return null if no token is provided
   }
 
   try {
@@ -134,17 +136,16 @@ app.get('/user', async (req, res) => {
     // Find the user by ID from the decoded token
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.json(null);  // Return null if the user is not found
     }
-
     console.log(user)
-
     res.json(user);
   } catch (err) {
     console.error('Error fetching user info:', err);
     res.status(500).json({ message: 'Error fetching user data' });
   }
 });
+
 
 app.post('/tracks', async (req, res) => {
   const { artist, track_name, image } = req.body;
