@@ -205,6 +205,13 @@ app.post('/reviews', async (req, res) => {
   }
 
   try {
+    // Check if the user has already reviewed this track
+    const existingReview = await Review.findOne({ user: userId, track: trackId });
+    if (existingReview) {
+      return res.status(400).json({ message: 'You have already reviewed this track' });
+    }
+
+    // Create and save the new review
     const newReview = new Review({
       user: userId,
       track: trackId,
