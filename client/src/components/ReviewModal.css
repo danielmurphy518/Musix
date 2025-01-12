@@ -1,0 +1,52 @@
+.review-modal-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .review-modal-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .review-modal-textarea {
+    width: 100%;
+    height: 100px;
+    resize: none;
+    border: 1px solid #333;
+    background-color: #121212;
+    color: #f1f1f1;
+    padding: 8px;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  
+  .review-modal-textarea:focus {
+    outline: none;
+    border-color: #666;
+  }
+  
+  .review-modal-submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .review-modal-submit-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .review-modal-submit-button:disabled {
+    background-color: #444;
+    cursor: not-allowed;
+  }
+  

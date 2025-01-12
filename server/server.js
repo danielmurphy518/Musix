@@ -10,7 +10,7 @@ const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
 
 const app = express();
-const port = 5000;
+const port = 4000;
 
 // MongoDB URI from .env
 const mongoURI = process.env.MONGO_URI;
@@ -73,7 +73,7 @@ app.post('/register', async (req, res) => {
 // Route to login (authenticate) a user
 app.post('/login', async (req, res) => {
   const { email, password } = req.body;
-  console.log(password)
+
   if (!email || !password) {
     return res.status(400).json({ message: 'Email and password are required' });
   }
@@ -81,15 +81,14 @@ app.post('/login', async (req, res) => {
   try {
     // Find user by email
     const user = await User.findOne({ email });
-    console.log(user)
+
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    console.log(password, user.password)
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    console.log(passwordMatch)
 
-    // Compare the entered password with the stored password (plain text comparison)
+    // Compare the entered password with the stored password (hashed)
+    const passwordMatch = await bcrypt.compare(password, user.password);
+
     if (!passwordMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
@@ -101,19 +100,33 @@ app.post('/login', async (req, res) => {
       { expiresIn: '1h' }      // Token expiration time (1 hour)
     );
 
-    res.json({ message: 'Login successful', token });
+    // Return the token along with user details
+    res.json({
+      message: 'Login successful',
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email
+      }
+    });
   } catch (err) {
     console.error('Error logging in user:', err);
     res.status(500).json({ message: 'Error logging in user' });
   }
 });
 
+
+
 // Route to get user information (protected)
 app.get('/user', async (req, res) => {
+  console.log("working?")
   const token = req.headers.authorization?.split(' ')[1];  // Extract the token from the Authorization header
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    console.log("return")
+    return res.json(null);  // Return null if no token is provided
   }
 
   try {
@@ -123,17 +136,16 @@ app.get('/user', async (req, res) => {
     // Find the user by ID from the decoded token
     const user = await User.findById(decoded.userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return res.json(null);  // Return null if the user is not found
     }
-
     console.log(user)
-
     res.json(user);
   } catch (err) {
     console.error('Error fetching user info:', err);
     res.status(500).json({ message: 'Error fetching user data' });
   }
 });
+
 
 app.post('/tracks', async (req, res) => {
   const { artist, track_name, image } = req.body;
@@ -188,12 +200,19 @@ app.get('/track/:trackId', async (req, res) => {
 
 app.post('/reviews', async (req, res) => {
   const { userId, trackId, content, rating } = req.body;
-
+  
   if (!userId || !trackId || !content || !rating) {
     return res.status(400).json({ message: 'All fields are required' });
   }
 
   try {
+    // Check if the user has already reviewed this track
+    const existingReview = await Review.findOne({ user: userId, track: trackId });
+    if (existingReview) {
+      return res.status(400).json({ message: 'You have already reviewed this track' });
+    }
+
+    // Create and save the new review
     const newReview = new Review({
       user: userId,
       track: trackId,
@@ -258,6 +277,64 @@ app.get('/user/:userId', async (req, res) => {
   } catch (err) {
     console.error('Error fetching user by ID with reviews:', err);
     res.status(500).json({ message: 'Error fetching user and reviews' });
+  }
+});
+
+//this is extremely dangerous and should never be used, ever.
+app.delete('/reviews', async (req, res) => {
+  try {
+    // Delete all reviews
+    await Review.deleteMany({});
+    res.status(200).json({ message: 'All reviews have been cleared' });
+  } catch (err) {
+    console.error('Error clearing reviews:', err);
+    res.status(500).json({ message: 'Error clearing reviews' });
+  }
+});
+
+app.delete('/review/:reviewId', async (req, res) => {
+  const { reviewId } = req.params;
+
+  try {
+    const deletedReview = await Review.findByIdAndDelete(reviewId);
+
+    if (!deletedReview) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+
+    res.status(200).json({ message: 'Review deleted successfully', review: deletedReview });
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    res.status(500).json({ message: 'Error deleting review' });
+  }
+});
+
+app.patch('/reviews/:reviewId', async (req, res) => {
+  const { reviewId } = req.params;
+  const { content, rating } = req.body;
+
+  if (!content && rating === undefined) {
+    return res.status(400).json({ message: 'Content or rating is required to update the review' });
+  }
+
+  try {
+    const review = await Review.findById(reviewId);
+
+    if (!review) {
+      return res.status(404).json({ message: 'Review not found' });
+    }
+    if (content) review.content = content;
+    if (rating !== undefined) review.rating = rating;
+
+    const updatedReview = await review.save();
+
+    res.status(200).json({
+      message: 'Review updated successfully',
+      review: updatedReview
+    });
+  } catch (err) {
+    console.error('Error updating review:', err);
+    res.status(500).json({ message: 'Error updating review' });
   }
 });
 

@@ -1,12 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchTrackById, fetchReviewsByTrackId } from '../api';
+import { fetchTrackById, fetchReviewsByTrackId, submitReview } from '../api';
+import ReviewModal from './ReviewModal';
+import Rating from '@mui/material/Rating';
 import './Trackpage.css';
+import { UserContext } from '../UserContext';
 
 const TrackPage = () => {
-  const { trackId } = useParams(); // Get trackId from URL params
+  const { trackId } = useParams();
   const [track, setTrack] = useState(null);
   const [reviews, setReviews] = useState(null);
+  const [reviewContent, setReviewContent] = useState('');
+  const [rating, setRating] = useState(0);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useContext(UserContext);
 
   useEffect(() => {
     const fetchTrackAndReviews = async () => {
@@ -15,10 +24,8 @@ const TrackPage = () => {
           fetchTrackById(trackId),
           fetchReviewsByTrackId(trackId),
         ]);
-
         if (trackData) setTrack(trackData);
         if (reviewData) setReviews(reviewData);
-        console.log(reviewData);
       } catch (error) {
         console.error('Error fetching track or reviews:', error);
       }
@@ -27,24 +34,38 @@ const TrackPage = () => {
     fetchTrackAndReviews();
   }, [trackId]);
 
-  // Function to display stars based on the rating
-  const renderStars = (rating) => {
-    const totalStars = 5;
-    const filledStars = Math.floor(rating); // Get the integer part (full stars)
-    const hasHalfStar = rating % 1 >= 0.5; // Check if there should be a half star
-    const emptyStars = totalStars - filledStars - (hasHalfStar ? 1 : 0); // Remaining empty stars
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
 
-    // Create an array of stars for rendering
-    return Array.from({ length: filledStars + (hasHalfStar ? 1 : 0) + emptyStars }, (_, index) => {
-      if (index < filledStars) {
-        return <span key={index} className="filled">★</span>; // Full star
+    if (!reviewContent || rating === 0) {
+      alert('Please write a review and select a rating!');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await submitReview(trackId, reviewContent, rating, user);
+      if (response) {
+        setReviews((prevReviews) => [
+          ...prevReviews,
+          { content: reviewContent, rating, user: { name: user.name } },
+        ]);
+        setReviewContent('');
+        setRating(0);
+        setIsReviewModalOpen(false);
+      } else {
+        alert('Failed to submit review. Please try again later.');
       }
-      if (index === filledStars && hasHalfStar) {
-        return <span key={index} className="half-filled">½</span>; // Half star
-      }
-      return <span key={index} className="empty">☆</span>; // Empty star
-    });
+    } catch (error) {
+      console.error('Error submitting review:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  const openReviewModal = () => setIsReviewModalOpen(true);
+  const closeReviewModal = () => setIsReviewModalOpen(false);
 
   if (!track) {
     return <div>Loading...</div>;
@@ -64,25 +85,35 @@ const TrackPage = () => {
       <div className="reviews-section">
         <h2>Reviews</h2>
         {reviews && reviews.length > 0 ? (
-          reviews.map((review) => (
-            <div key={review._id} className="review">
+          reviews.map((review, index) => (
+            <div key={index} className="review">
               <p>
-                <strong>
-                  <a href={`/user/${review.user._id}`} className="user-link">
-                    {review.user.name}
-                  </a>
-                </strong>
-                : {review.content}
+                <strong>{review.user.name}</strong>: {review.content}
               </p>
               <div className="review-rating">
-                {renderStars(review.rating)} {/* Render stars based on the rating */}
+                <Rating value={review.rating} readOnly precision={0.5} />
               </div>
             </div>
           ))
         ) : (
           <p>No reviews available.</p>
         )}
+
+        <button onClick={openReviewModal} className="add-review-button">
+          Add Review
+        </button>
       </div>
+
+      <ReviewModal
+        isOpen={isReviewModalOpen}
+        closeModal={closeReviewModal}
+        rating={rating}
+        setRating={setRating}
+        reviewContent={reviewContent}
+        setReviewContent={setReviewContent}
+        handleReviewSubmit={handleReviewSubmit}
+        isSubmitting={isSubmitting}
+      />
     </div>
   );
 };
