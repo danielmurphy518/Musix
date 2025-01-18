@@ -20,6 +20,9 @@ const LoginForm = ({ closeModal }) => {
         localStorage.setItem('token', data.token);
         //localStorage.setItem('userId', data.userId);
         login(data.user); // Update context with the logged-in user's info
+        
+        //This is probably a bad fix but it will do for now
+        window.location.reload()
         closeModal();
       } else {
         setError(data.message || 'Login failed. Please check your credentials.'); // Set error message

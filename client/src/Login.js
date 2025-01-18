@@ -17,7 +17,7 @@ const Login = ({ setLoggedInUser }) => {
 
     const onSubmit = async e => {
         e.preventDefault();
-        console.log(email, password)
+        console.log("logging in worked!!")
         try {
             const res = 
                 await axios.post('http://localhost:5000/login', 
@@ -30,6 +30,9 @@ const Login = ({ setLoggedInUser }) => {
             
             // Set success message
             setMessage('Logged in successfully');
+
+            //TODO: figure out a better way to handle this
+            location.reload();
         } catch (err) {
             console.error(err.response.data);
             // Set error message
