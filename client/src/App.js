@@ -74,8 +74,8 @@ const App = () => {
                     />
                     <div className="content-wrapper">
                         <Routes>
-                            <Route path="/" element={<Homepage />} />
-                            <Route path="/tracks" element={<Homepage />} />
+                            <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
+                            <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
                             <Route path="/track/:trackId" element={<TrackPage />} />
                             <Route path="/user/:userId" element={<UserPage />} />
                             <Route path="/login" element={<Login />} />

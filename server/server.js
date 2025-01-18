@@ -148,21 +148,24 @@ app.get('/user', async (req, res) => {
 
 
 app.post('/tracks', async (req, res) => {
-  const { artist, track_name, image } = req.body;
-
-  if (!artist || !track_name) {
-    return res.status(400).json({ message: 'Artist and track name are required' });
-  }
+  const { artist, track_name, image, isFeatured } = req.body;
 
   try {
-    const newTrack = new Track({ artist, track_name, image });
-    const savedTrack = await newTrack.save();
-    res.status(201).json(savedTrack);
+    const newTrack = new Track({
+      artist,
+      track_name,
+      image,
+      isFeatured: isFeatured || false, // Defaults to false if not provided
+    });
+
+    await newTrack.save();
+    res.status(201).json(newTrack);
   } catch (err) {
     console.error('Error creating track:', err);
     res.status(500).json({ message: 'Error creating track' });
   }
 });
+
 
 app.get('/tracks', async (req, res) => {
   try {
@@ -184,17 +187,36 @@ app.get('/tracks/recent', async (req, res) => {
   }
 });
 
+
+
 app.get('/track/:trackId', async (req, res) => {
   try {
     const { trackId } = req.params;
     const track = await Track.findById(trackId);
+
     if (!track) {
       return res.status(404).json({ message: 'Track not found' });
     }
+
     res.json(track);
   } catch (error) {
     console.error('Error fetching track:', error);
     res.status(500).json({ message: 'Server error' });
+  }
+});
+
+app.get('/track/featured', async (req, res) => {
+  try {
+    const featuredTrack = await Track.findOne({ isFeatured: true });
+
+    if (!featuredTrack) {
+      return res.status(404).json({ message: 'No featured track found' });
+    }
+
+    res.json(featuredTrack);
+  } catch (err) {
+    console.error('Error fetching featured track:', err);
+    res.status(500).json({ message: 'Error fetching featured track' });
   }
 });
 
@@ -337,6 +359,7 @@ app.patch('/reviews/:reviewId', async (req, res) => {
     res.status(500).json({ message: 'Error updating review' });
   }
 });
+
 
 // Start the server
 app.listen(port, () => {

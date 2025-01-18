@@ -23,6 +23,7 @@ function ResponsiveAppBar({ openLoginModal }) {
 
   // Get user from context
   const { user } = useContext(UserContext);
+  console.log(user)
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -173,7 +174,7 @@ function ResponsiveAppBar({ openLoginModal }) {
                 {user ? (
                   <MenuItem
                     component={Link}
-                    to={`/user/${user.id}`}
+                    to={`/user/${user._id}`}
                     onClick={handleCloseUserMenu}
                   >
                     <Typography textAlign="center">Profile</Typography>

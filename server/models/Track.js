@@ -16,6 +16,11 @@ const TrackSchema = new mongoose.Schema({
     type: String, // URL for the track image
     required: false, // Not required initially
   },
+  isFeatured: {
+    type: Boolean,  // Add the field to mark if the track is featured
+    required: false,
+    default: false, // Optional field
+  }
 }, { timestamps: true }); // Add createdAt and updatedAt fields
 
 // Export the Track model
