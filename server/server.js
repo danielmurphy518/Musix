@@ -187,6 +187,20 @@ app.get('/tracks/recent', async (req, res) => {
   }
 });
 
+app.get('/track/featured', async (req, res) => {
+  try {
+    const featuredTrack = await Track.findOne({ isFeatured: true });
+
+    if (!featuredTrack) {
+      return res.status(404).json({ message: 'No featured track found' });
+    }
+    
+    res.json(featuredTrack);
+  } catch (err) {
+    console.error('Error fetching featured track:', err);
+    res.status(500).json({ message: 'Error fetching featured track' });
+  }
+});
 
 
 app.get('/track/:trackId', async (req, res) => {
@@ -205,20 +219,6 @@ app.get('/track/:trackId', async (req, res) => {
   }
 });
 
-app.get('/track/featured', async (req, res) => {
-  try {
-    const featuredTrack = await Track.findOne({ isFeatured: true });
-
-    if (!featuredTrack) {
-      return res.status(404).json({ message: 'No featured track found' });
-    }
-
-    res.json(featuredTrack);
-  } catch (err) {
-    console.error('Error fetching featured track:', err);
-    res.status(500).json({ message: 'Error fetching featured track' });
-  }
-});
 
 app.post('/reviews', async (req, res) => {
   const { userId, trackId, content, rating } = req.body;
