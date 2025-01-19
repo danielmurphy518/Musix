@@ -91,7 +91,17 @@ const TrackPage = () => {
                 <strong>{review.user.name}</strong>: {review.content}
               </p>
               <div className="review-rating">
-                <Rating value={review.rating} readOnly precision={0.5} />
+                <Rating       sx={{
+        '& .MuiRating-iconFilled': {
+          color: '#FFD700', // Color for filled stars
+        },
+        '& .MuiRating-iconEmpty': {
+          color: '#B0B0B0', // Lighter color for empty stars (edges)
+        },
+        '& .MuiRating-iconHover': {
+          color: '#FFD700', // Hover effect color
+        }
+      }}value={review.rating} readOnly precision={0.5} />
               </div>
             </div>
           ))

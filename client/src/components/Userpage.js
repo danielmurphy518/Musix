@@ -49,6 +49,17 @@ const UserPage = () => {
               <div className="review-rating">
                 {/* Using Material UI Rating Component */}
                 <Rating 
+                      sx={{
+                        '& .MuiRating-iconFilled': {
+                          color: '#FFD700', // Color for filled stars
+                        },
+                        '& .MuiRating-iconEmpty': {
+                          color: '#B0B0B0', // Lighter color for empty stars (edges)
+                        },
+                        '& .MuiRating-iconHover': {
+                          color: '#FFD700', // Hover effect color
+                        }
+                      }}
                   name="read-only" 
                   value={review.rating} 
                   readOnly 
