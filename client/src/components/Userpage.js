@@ -32,9 +32,28 @@ const UserPage = () => {
 
   return (
     <div className="user-page">
-      <h1>{user.name}</h1>
-      <h3>@{user.username}</h3>
+      {/* Banner Section with Sample Image */}
+      <div className="banner" style={{ backgroundImage: `url('https://i.scdn.co/image/ab67616d0000b2734a922c82d905e7ffffd1d045')` }}>
+        <div className="profile-section">
+          {/* Profile Image Placeholder */}
+          <div className="profile-image">
+            <img src="https://t3.ftcdn.net/jpg/02/36/99/22/360_F_236992283_sNOxCVQeFLd5pdqaKGh8DRGMZy7P4XKm.jpg" alt="Profile" />
+          </div>
+          {/* Username and @ Handle */}
+          <div className="profile-info">
+            <h1>{user.name}</h1>
+            <h3>@{user.username}</h3>
+          </div>
+        </div>
 
+        {/* Total Reviews Box */}
+        <div className="total-reviews-box">
+          <h3>Total Reviews</h3>
+          <p>{reviews.length}</p>
+        </div>
+      </div>
+
+      {/* Reviews Section */}
       <div className="reviews-section">
         <h2>Reviews</h2>
         {reviews && reviews.length > 0 ? (
@@ -49,17 +68,17 @@ const UserPage = () => {
               <div className="review-rating">
                 {/* Using Material UI Rating Component */}
                 <Rating 
-                      sx={{
-                        '& .MuiRating-iconFilled': {
-                          color: '#FFD700', // Color for filled stars
-                        },
-                        '& .MuiRating-iconEmpty': {
-                          color: '#B0B0B0', // Lighter color for empty stars (edges)
-                        },
-                        '& .MuiRating-iconHover': {
-                          color: '#FFD700', // Hover effect color
-                        }
-                      }}
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: '#FFD700', // Color for filled stars
+                    },
+                    '& .MuiRating-iconEmpty': {
+                      color: '#B0B0B0', // Lighter color for empty stars (edges)
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: '#FFD700', // Hover effect color
+                    }
+                  }}
                   name="read-only" 
                   value={review.rating} 
                   readOnly 

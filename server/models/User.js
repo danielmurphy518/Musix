@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  // New "data" field
+  data: {
+    review_count: {
+      type: Number,
+      default: 0 // Default value for review_count
+    },
+    // You can add more fields here as needed
+    // Example: total_ratings, last_review_date, etc.
   }
 });
 
