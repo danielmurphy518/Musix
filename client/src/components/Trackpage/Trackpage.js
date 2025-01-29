@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext} from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchTrackById, fetchReviewsByTrackId, submitReview } from '../api';
-import ReviewModal from './ReviewModal';
+import { fetchTrackById, fetchReviewsByTrackId, submitReview } from '../../api';
+import ReviewModal from '../ReviewModal';
 import Rating from '@mui/material/Rating';
 import './Trackpage.css';
-import { UserContext } from '../UserContext';
+import { UserContext } from '../../UserContext';
 
 const TrackPage = () => {
   const { trackId } = useParams();

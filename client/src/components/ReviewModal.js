@@ -1,6 +1,6 @@
 import React from 'react';
 import { Rating } from '@mui/material';
-import Modal from './Modal';
+import Modal from './Modal/Modal';
 
 const ReviewModal = ({
   isOpen,

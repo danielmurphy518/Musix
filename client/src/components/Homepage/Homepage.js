@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom"; // Import Link from react-router-dom
 import "./Homepage.css";
-import { fetchRecentTracks, fetchFeaturedTrack } from "../api"; // Assume these functions fetch tracks
-import { UserContext } from "../UserContext";
+import { fetchRecentTracks, fetchFeaturedTrack } from "../../api"; // Assume these functions fetch tracks
+import { UserContext } from "../../UserContext";
 
 const Homepage = ({ openLoginModal }) => {
   const [tracks, setTracks] = useState([]);

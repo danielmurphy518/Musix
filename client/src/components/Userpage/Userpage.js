@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchUserspage } from '../api';
+import { fetchUserspage } from '../../api';
 import Rating from '@mui/material/Rating'; // Import the Rating component
 import './Userpage.css';
 
