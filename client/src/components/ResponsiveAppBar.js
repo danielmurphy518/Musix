@@ -13,7 +13,7 @@ import MenuItem from '@mui/material/MenuItem';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import PersonIcon from '@mui/icons-material/Person';
 import { Link } from 'react-router-dom';
-import { UserContext } from '../UserContext';
+import { UserContext, logout} from '../UserContext';
 
 const pages = ['Tracks', 'Members'];
 
@@ -22,8 +22,8 @@ function ResponsiveAppBar({ openLoginModal }) {
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
   // Get user from context
-  const { user } = useContext(UserContext);
-  console.log(user)
+  const { user, logout } = useContext(UserContext); // Call inside component
+  console.log(user);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -39,6 +39,12 @@ function ResponsiveAppBar({ openLoginModal }) {
 
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
+  };
+
+  // Placeholder logout function
+  const handleLogout = () => {
+    logout();
+    handleCloseUserMenu();
   };
 
   return (
@@ -148,11 +154,9 @@ function ResponsiveAppBar({ openLoginModal }) {
 
             {/* User Menu */}
             <Box sx={{ flexGrow: 0 }}>
-              
-                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                  <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
-                </IconButton>
-              
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
+              </IconButton>
 
               <Menu
                 sx={{ mt: '45px' }}
@@ -172,13 +176,22 @@ function ResponsiveAppBar({ openLoginModal }) {
               >
                 {/* Show Profile if logged in, otherwise show Login */}
                 {user ? (
-                  <MenuItem
-                    component={Link}
-                    to={`/user/${user._id}`}
-                    onClick={handleCloseUserMenu}
-                  >
-                    <Typography textAlign="center">Profile</Typography>
-                  </MenuItem>
+                  [
+                    <MenuItem
+                      key="profile"
+                      component={Link}
+                      to={`/user/${user._id}`}
+                      onClick={handleCloseUserMenu}
+                    >
+                      <Typography textAlign="center">Profile</Typography>
+                    </MenuItem>,
+                    <MenuItem
+                      key="logout"
+                      onClick={handleLogout}
+                    >
+                      <Typography textAlign="center">Logout</Typography>
+                    </MenuItem>,
+                  ]
                 ) : (
                   <MenuItem
                     onClick={() => {
