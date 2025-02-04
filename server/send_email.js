@@ -1,47 +1,52 @@
 const nodemailer = require("nodemailer");
-require("dotenv").config(); // Load environment variables
+const fs = require("fs");
+const path = require("path");
+require("dotenv").config();
 
-// Log environment variables to verify they are loaded
-console.log("EMAIL_USER:", process.env.EMAIL_USER);
-console.log("EMAIL_PASSWORD:", process.env.EMAIL_PASSWORD);
+// Read email template file and replace placeholders
+const loadTemplate = (templateName, data) => {
+  const templatePath = path.join(__dirname, 'templates', `${templateName}.html`);
+  
+  try {
+    let template = fs.readFileSync(templatePath, 'utf8'); // Read the template file
+    // Replace placeholders in the template with actual data
+    for (const [key, value] of Object.entries(data)) {
+      const placeholder = `{{${key}}}`;
+      template = template.replace(new RegExp(placeholder, 'g'), value);
+    }
+    return template;
+  } catch (error) {
+    console.error("Error loading template:", error);
+    throw new Error('Template not found');
+  }
+};
 
 // Create a transporter object
 let transporter;
 try {
   transporter = nodemailer.createTransport({
-    service: "gmail", // Use your email service (e.g., Gmail, Outlook)
+    service: "gmail",
     auth: {
-      user: process.env.EMAIL_USER, // Your email address
-      pass: process.env.EMAIL_PASSWORD, // Your email password or app-specific password
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
     },
-    debug: true, // Enable debugging
-    logger: true, // Log to console
+    debug: true,
+    logger: true,
   });
-  console.log("Transporter created successfully:", transporter);
 } catch (error) {
   console.error("Error creating transporter:", error);
 }
 
-/**
- * Send an email
- * @param {string} to - Recipient email address
- * @param {string} subject - Email subject
- * @param {string} text - Plain text body
- * @param {string} html - HTML body (optional)
- * @returns {Promise} - Resolves if email is sent successfully, rejects otherwise
- */
-const sendEmail = (to, subject, text, html = "") => {
-  // Input validation
-  if (!to || !subject || !text) {
-    throw new Error("Missing required fields: to, subject, or text");
-  }
-
+// Send email function
+const sendEmail = (to, subject, templateName, templateData) => {
+  // Load the HTML template and replace placeholders with data
+  const htmlContent = loadTemplate(templateName, templateData);
+  
   const mailOptions = {
-    from: process.env.EMAIL_USER, // Sender address
-    to, // Recipient address
-    subject, // Subject line
-    text, // Plain text body
-    html: html || text, // Use HTML if provided, otherwise fallback to text
+    from: process.env.EMAIL_USER,
+    to,
+    subject,
+    html: htmlContent, // Use the HTML content
   };
 
   return transporter.sendMail(mailOptions);

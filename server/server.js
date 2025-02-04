@@ -362,11 +362,15 @@ app.patch('/reviews/:reviewId', async (req, res) => {
 });
 
 app.post("/send-email", async (req, res) => {
-  const { to, subject, text, html } = req.body;
-  console.log(to, subject,text, html)
+  const { to, subject, templateName, templateData } = req.body;
+  console.log("Sending email with template:", templateName);
+  console.log("To:", to);
+  console.log("Subject:", subject);
+  console.log("Template Data:", templateData);
 
   try {
-    await sendEmail(to, subject, text, html);
+    // Send email with the chosen template and data
+    await sendEmail(to, subject, templateName, templateData);
     res.status(200).json({ message: "Email sent successfully!" });
   } catch (error) {
     console.error("Error sending email:", error);
