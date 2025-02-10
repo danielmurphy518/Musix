@@ -1,41 +1,79 @@
 import React, { useState, useContext } from 'react';
 import { UserContext } from '../UserContext'; // Import the context
-import { loginUser } from '../api'; // Import the loginUser function from api.js
+import { loginUser, registerUser } from '../api'; // Import the loginUser and registerUser functions from api.js
 
 const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
+  const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(''); // State for handling errors
+  const [isLogin, setIsLogin] = useState(true); // State to toggle between login and sign-up
   const { login } = useContext(UserContext); // Access the login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Reset the error before each login attempt
+    setError(''); // Reset the error before each submission attempt
+
+    if (!isLogin && password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
 
     try {
-      const data = await loginUser({ email, password }); // Use the loginUser function from api.js
-      //console.log(data)
-      if (data.token) {
-        console.log(data.token)
-        localStorage.setItem('token', data.token);
-        //localStorage.setItem('userId', data.userId);
-        login(data.user); // Update context with the logged-in user's info
-        
-        //This is probably a bad fix but it will do for now
-        window.location.reload()
-        closeModal();
+      let data;
+      if (isLogin) {
+        // Login logic
+        data = await loginUser({ email, password });
       } else {
-        setError(data.message || 'Login failed. Please check your credentials.'); // Set error message
+        // Sign-up logic
+        data = await registerUser({ username, email, password, name });
+      }
+
+      if (data.token) {
+        localStorage.setItem('token', data.token); // Save token to localStorage
+        login(data.user); // Update context with the logged-in user's info
+        closeModal(); // Close the modal
+        window.location.reload(); // Reload the page to reflect changes
+      } else {
+        setError(data.message || 'Something went wrong. Please try again.'); // Set error message
       }
     } catch (err) {
-      console.error('Error during login:', err);
+      console.error('Error:', err);
       setError('An error occurred. Please try again later.');
     }
   };
 
   return (
     <form onSubmit={handleSubmit} style={formStyles}>
-      <h2 style={headingStyles}>Login</h2>
+      <h2 style={headingStyles}>{isLogin ? 'Login' : 'Sign Up'}</h2>
+
+      {/* Name Field (only for Sign Up) */}
+      {!isLogin && (
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name"
+          required
+          style={inputStyles}
+        />
+      )}
+
+      {/* Username Field (only for Sign Up) */}
+      {!isLogin && (
+        <input
+          type="text"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          placeholder="Username"
+          required
+          style={inputStyles}
+        />
+      )}
+
+      {/* Email Field */}
       <input
         type="email"
         value={email}
@@ -44,6 +82,8 @@ const LoginForm = ({ closeModal }) => {
         required
         style={inputStyles}
       />
+
+      {/* Password Field */}
       <input
         type="password"
         value={password}
@@ -52,7 +92,19 @@ const LoginForm = ({ closeModal }) => {
         required
         style={inputStyles}
       />
-      
+
+      {/* Confirm Password Field (only for Sign Up) */}
+      {!isLogin && (
+        <input
+          type="password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          placeholder="Confirm Password"
+          required
+          style={inputStyles}
+        />
+      )}
+
       {/* Conditionally display error message with inline styling */}
       {error && (
         <h3 style={{ 
@@ -65,11 +117,28 @@ const LoginForm = ({ closeModal }) => {
         </h3>
       )}
 
-      <button type="submit" style={buttonStyles}>Login</button>
+      <button type="submit" style={buttonStyles}>
+        {isLogin ? 'Login' : 'Sign Up'}
+      </button>
+
+      {/* Toggle between Login and Sign Up */}
+      <p style={toggleTextStyles}>
+        {isLogin ? "Don't have an account? " : "Already have an account? "}
+        <span
+          style={toggleLinkStyles}
+          onClick={() => {
+            setIsLogin(!isLogin); // Toggle between login and sign-up
+            setError(''); // Clear any existing errors
+          }}
+        >
+          {isLogin ? 'Sign Up' : 'Login'}
+        </span>
+      </p>
     </form>
   );
 };
 
+// Styles (unchanged)
 const formStyles = {
   display: 'flex',
   flexDirection: 'column',
@@ -101,6 +170,19 @@ const buttonStyles = {
   borderRadius: '4px',
   cursor: 'pointer',
   transition: 'background-color 0.3s',
+};
+
+const toggleTextStyles = {
+  color: '#F0F0F0',
+  fontSize: '14px',
+  textAlign: 'center',
+  marginTop: '10px',
+};
+
+const toggleLinkStyles = {
+  color: '#007BFF',
+  cursor: 'pointer',
+  textDecoration: 'underline',
 };
 
 export default LoginForm;
