@@ -10,11 +10,13 @@ const LoginForm = ({ closeModal }) => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(''); // State for handling errors
   const [isLogin, setIsLogin] = useState(true); // State to toggle between login and sign-up
+  const [successMessage, setSuccessMessage] = useState(''); // State for success message
   const { login } = useContext(UserContext); // Access the login function from context
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(''); // Reset the error before each submission attempt
+    setSuccessMessage(''); // Reset the success message
 
     if (!isLogin && password !== confirmPassword) {
       setError('Passwords do not match.');
@@ -30,12 +32,23 @@ const LoginForm = ({ closeModal }) => {
         // Sign-up logic
         data = await registerUser({ username, email, password, name });
       }
-
+      console.log(data)
       if (data.token) {
         localStorage.setItem('token', data.token); // Save token to localStorage
         login(data.user); // Update context with the logged-in user's info
         closeModal(); // Close the modal
         window.location.reload(); // Reload the page to reflect changes
+      } else if (!isLogin && data.success) {
+        console.log("going here?????")
+        // If registration is successful but no token is returned
+        setSuccessMessage('Thanks for signing up. Please check your email for steps to verify your account.');
+        setIsLogin(true); // Switch back to the login form
+        // Clear form fields
+        setEmail('');
+        setUsername('');
+        setName('');
+        setPassword('');
+        setConfirmPassword('');
       } else {
         setError(data.message || 'Something went wrong. Please try again.'); // Set error message
       }
@@ -117,6 +130,18 @@ const LoginForm = ({ closeModal }) => {
         </h3>
       )}
 
+      {/* Conditionally display success message with inline styling */}
+      {successMessage && (
+        <h3 style={{ 
+          color: 'green', 
+          fontSize: '14px', 
+          textAlign: 'center', 
+          marginBottom: '16px' 
+        }}>
+          {successMessage}
+        </h3>
+      )}
+
       <button type="submit" style={buttonStyles}>
         {isLogin ? 'Login' : 'Sign Up'}
       </button>
@@ -129,6 +154,7 @@ const LoginForm = ({ closeModal }) => {
           onClick={() => {
             setIsLogin(!isLogin); // Toggle between login and sign-up
             setError(''); // Clear any existing errors
+            setSuccessMessage(''); // Clear any success messages
           }}
         >
           {isLogin ? 'Sign Up' : 'Login'}

@@ -9,7 +9,7 @@ const User = require('./models/User');
 const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
 const { sendEmail } = require("./send_email.js"); // Import the email service
-
+const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
 const app = express();
 const port = 4000;
 
@@ -64,7 +64,7 @@ app.post('/register', async (req, res) => {
     });
 
     await newUser.save();
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
     res.status(500).json({ message: 'Error registering user' });
@@ -306,14 +306,31 @@ app.get('/user/:userId', async (req, res) => {
 //this is extremely dangerous and should never be used, ever.
 app.delete('/reviews', async (req, res) => {
   try {
-    // Delete all reviews
-    await Review.deleteMany({});
-    res.status(200).json({ message: 'All reviews have been cleared' });
+    const result = await clearReviews();
+    res.status(200).json(result);
   } catch (err) {
-    console.error('Error clearing reviews:', err);
-    res.status(500).json({ message: 'Error clearing reviews' });
+    res.status(500).json({ success: false, message: err.message });
   }
 });
+
+app.delete('/users', async (req, res) => {
+  try {
+    const result = await clearUsers();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
+app.delete('/clear-all', async (req, res) => {
+  try {
+    const result = await clearAllData();
+    res.status(200).json(result);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+});
+
 
 app.delete('/review/:reviewId', async (req, res) => {
   const { reviewId } = req.params;
