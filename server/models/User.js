@@ -20,6 +20,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  activated : {
+    type: Boolean,
+    required:true
+  },
   // New "data" field
   data: {
     review_count: {
