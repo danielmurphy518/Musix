@@ -406,6 +406,7 @@ app.delete('/delete-inactive-users', async (req, res) => {
 });
 
 // Start the server
+//An error here likely is linked to Mongo Credentials
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
