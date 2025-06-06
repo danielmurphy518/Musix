@@ -60,7 +60,8 @@ app.post('/register', async (req, res) => {
       name,
       username,
       email,
-      password: hashedpass  // Storing plain password (no hashing)
+      password: hashedpass,  // Storing plain password (no hashing),
+      activated: false
     });
 
     await newUser.save();
@@ -390,6 +391,19 @@ app.post("/send-email", async (req, res) => {
   }
 });
 
+
+app.delete('/delete-inactive-users', async (req, res) => {
+  try {
+    const result = await User.deleteMany({ activated: false });
+    res.status(200).json({
+      success: true,
+      message: `${result.deletedCount} inactive user(s) deleted`
+    });
+  } catch (err) {
+    console.error('Error deleting inactive users:', err);
+    res.status(500).json({ message: 'Error deleting inactive users' });
+  }
+});
 
 // Start the server
 app.listen(port, () => {
