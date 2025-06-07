@@ -442,6 +442,7 @@ app.get('/verify/:userId', async (req, res) => {
 
     // Or, for redirect:
     // res.redirect('https://your-app.com/login');
+    //console.log("ahhhhhh")
 
   } catch (error) {
     console.error('Error activating user:', error);
