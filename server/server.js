@@ -65,6 +65,21 @@ app.post('/register', async (req, res) => {
     });
 
     await newUser.save();
+
+    const verificationLink = `https://your-app.com/verify/${newUser._id}`;
+
+    // Send activation email
+    await sendEmail(
+      newUser.email,
+      'Activate your Music App account',
+      'complete_signup',  // your template file without extension, e.g., signup.html
+      {
+        name: newUser.name,
+        verificationLink,
+      }
+    );
+
+
     res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -402,6 +417,35 @@ app.delete('/delete-inactive-users', async (req, res) => {
   } catch (err) {
     console.error('Error deleting inactive users:', err);
     res.status(500).json({ message: 'Error deleting inactive users' });
+  }
+});
+
+app.get('/verify/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).send('User not found');
+    }
+
+    if (user.activated) {
+      return res.send('Account already activated');
+    }
+
+    user.activated = 1; // or true, depending on your schema
+    await user.save();
+
+    // Optionally redirect to login or success page
+    res.send('Account activated successfully! You can now log in.');
+
+    // Or, for redirect:
+    // res.redirect('https://your-app.com/login');
+
+  } catch (error) {
+    console.error('Error activating user:', error);
+    res.status(500).send('Internal server error');
   }
 });
 
