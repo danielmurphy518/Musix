@@ -20,6 +20,16 @@ const TrackSchema = new mongoose.Schema({
     type: Boolean,  // Add the field to mark if the track is featured
     required: false,
     default: false, // Optional field
+  },
+  average_rating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5
+  },
+  review_count: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true }); // Add createdAt and updatedAt fields
 
