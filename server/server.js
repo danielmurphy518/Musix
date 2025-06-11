@@ -66,7 +66,7 @@ app.post('/register', async (req, res) => {
 
     await newUser.save();
 
-    const verificationLink = `https://your-app.com/verify/${newUser._id}`;
+    const verificationLink = `http://localhost:3000/verify/${newUser._id}`;
 
     // Send activation email
     await sendEmail(

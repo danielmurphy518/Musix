@@ -2,7 +2,7 @@ const { sendEmail } = require('./send_email'); // Correct path
 // Sample data to replace placeholders in the template
 const templateData = {
   name: "John Doe", // Replace with the user's name
-  verificationLink: "https://yourapp.com/verify?token=abc123", // Replace with the actual verification link
+  verificationLink: "http://localhost:4000/verify?token=abc123", // Replace with the actual verification link
 };
 
 // Email details
