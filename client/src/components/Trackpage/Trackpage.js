@@ -51,6 +51,12 @@ const TrackPage = () => {
           ...prevReviews,
           { content: reviewContent, rating, user: { name: user.name } },
         ]);
+        // Update the track's rating stats after submitting a new review
+        setTrack(prevTrack => ({
+          ...prevTrack,
+          average_rating: ((prevTrack.average_rating * prevTrack.review_count) + rating) / (prevTrack.review_count + 1),
+          review_count: prevTrack.review_count + 1
+        }));
         setReviewContent('');
         setRating(0);
         setIsReviewModalOpen(false);
@@ -76,6 +82,30 @@ const TrackPage = () => {
       <h1>{track.track_name}</h1>
       <h3>{track.artist}</h3>
       <p>{track.description}</p>
+      
+      {/* Track Rating Summary Section */}
+      <div className="track-rating-summary">
+        <div className="average-rating">
+          <Rating 
+            sx={{
+              '& .MuiRating-iconFilled': {
+                color: '#FFD700',
+              },
+              '& .MuiRating-iconEmpty': {
+                color: '#B0B0B0',
+              },
+              '& .MuiRating-iconHover': {
+                color: '#FFD700',
+              }
+            }}
+            value={track.average_rating || 0} 
+            readOnly 
+            precision={0.1} 
+          />
+          <span>{track.average_rating ? track.average_rating.toFixed(1) : 0} ({track.review_count || 0} reviews)</span>
+        </div>
+      </div>
+
       {track.image ? (
         <img src={track.image} alt={`${track.artist} - ${track.name}`} className="track-image" />
       ) : (
@@ -91,17 +121,22 @@ const TrackPage = () => {
                 <strong>{review.user.name}</strong>: {review.content}
               </p>
               <div className="review-rating">
-                <Rating       sx={{
-        '& .MuiRating-iconFilled': {
-          color: '#FFD700', // Color for filled stars
-        },
-        '& .MuiRating-iconEmpty': {
-          color: '#B0B0B0', // Lighter color for empty stars (edges)
-        },
-        '& .MuiRating-iconHover': {
-          color: '#FFD700', // Hover effect color
-        }
-      }}value={review.rating} readOnly precision={0.5} />
+                <Rating       
+                  sx={{
+                    '& .MuiRating-iconFilled': {
+                      color: '#FFD700',
+                    },
+                    '& .MuiRating-iconEmpty': {
+                      color: '#B0B0B0',
+                    },
+                    '& .MuiRating-iconHover': {
+                      color: '#FFD700',
+                    }
+                  }}
+                  value={review.rating} 
+                  readOnly 
+                  precision={0.5} 
+                />
               </div>
             </div>
           ))
