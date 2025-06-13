@@ -7,6 +7,7 @@ import TrackPage from "./components/Trackpage/Trackpage";
 import UserPage from "./components/Userpage/Userpage";
 import PasswordPrompt from "./components/PasswordPrompt";
 import LoginForm from "./components/LoginForm";
+import VerifyPage from "./components/Verifypage/Verifypage";
 import Modal from "./components/Modal/Modal";
 import ResponsiveAppBar from "./components/ResponsiveAppBar";
 import "./App.css";
@@ -80,6 +81,7 @@ const App = () => {
                             <Route path="/user/:userId" element={<UserPage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/signup" element={<Signup />} />
+                            <Route path="/verify/:token" element={<VerifyPage />} />                        
                         </Routes>
                     </div>
                     {/* Login Modal */}

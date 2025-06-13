@@ -1,0 +1,150 @@
+/* Main homepage container */
+.homepage-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px 0;
+  flex-direction: column; /* Stack the elements vertically */
+}
+
+/* Welcome box styling */
+.welcome-box {
+  background-color: #4c3f2a; /* Similar color to the track boxes */
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  color: white; /* White text for contrast */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Grid layout for boxes */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5 evenly spaced columns */
+  gap: 20px; /* Space between the boxes */
+  width: 100%;
+  justify-items: center;
+}
+
+/* Individual box styles */
+.grid-box {
+  width: 156px; /* Match image width */
+  height: 231px; /* Match image height */
+  background-color: #b2a17f;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.grid-box:hover {
+  background-color: #4c3f2a;
+  transform: scale(1.05);
+}
+
+/* Image styling */
+.track-image {
+  width: 156px; /* Fixed width */
+  height: 231px; /* Fixed height */
+  object-fit: cover; /* Ensures the image fits without distortion */
+  border-radius: 4px; /* Slight rounding for aesthetics */
+}
+
+/* Placeholder text for missing images */
+.placeholder {
+  color: white;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Welcome section with background image */
+.welcome-section {
+  position: relative;
+  width: 100%;
+  max-width: 600px; /* Set max-width for a square aspect ratio */
+  aspect-ratio: 1 / 1; /* Makes the section square */
+  margin: 20px auto; /* Center it horizontally and add spacing */
+  background-image: url('https://i.scdn.co/image/ab67616d0000b27315ebbedaacef61af244262a8'); /* Replace with the actual image path */
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px; /* Add rounded corners for a polished look */
+  overflow: hidden; /* Ensures child elements stay within the border */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+}
+
+/* Overlay to make the image blend better */
+.background-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.4),
+    rgba(0, 0, 0, 0.7)
+  ); /* Apply a gradient overlay for a smoother blend */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; /* Center content vertically */
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Centered text */
+.welcome-text {
+  text-align: center;
+  color: white;
+  z-index: 1;
+}
+
+.welcome-text h1 {
+  font-size: 3rem; /* Larger text */
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Optional: subtle shadow */
+}
+
+.welcome-text p {
+  font-size: 1.5rem; /* Larger text */
+}
+
+/* Image label positioning */
+.image-label {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 1rem;
+  color: #ddd;
+  text-shadow: 1px 1px 2px black;
+}
+
+/* Green Sign Up Button */
+.sign-up-button {
+  background-color: #28a745; /* Green background */
+  color: white;
+  padding: 15px 30px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.3s ease;
+  margin: 20px 0; /* Space above and below the button */
+}
+
+.sign-up-button:hover {
+  background-color: #218838; /* Darker green on hover */
+}
+
+.sign-up-button:focus {
+  outline: none; /* Remove default focus outline */
+}
