@@ -10,6 +10,7 @@ import LoginForm from "./components/LoginForm";
 import VerifyPage from "./components/Verifypage/Verifypage";
 import Modal from "./components/Modal/Modal";
 import ResponsiveAppBar from "./components/ResponsiveAppBar";
+import UserNetworkPage from "./components/Network/Networkgraph"
 import "./App.css";
 import { UserProvider } from "./UserContext";
 
@@ -81,7 +82,8 @@ const App = () => {
                             <Route path="/user/:userId" element={<UserPage />} />
                             <Route path="/login" element={<Login />} />
                             <Route path="/signup" element={<Signup />} />
-                            <Route path="/verify/:token" element={<VerifyPage />} />                        
+                            <Route path="/verify/:token" element={<VerifyPage />} />
+                            <Route path="/network" element={<UserNetworkPage />} />                         
                         </Routes>
                     </div>
                     {/* Login Modal */}

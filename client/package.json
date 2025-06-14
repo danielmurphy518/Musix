@@ -13,7 +13,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",
-    "react-scripts": "5.0.1"
+    "react-scripts": "5.0.1",
+    "vis-network": "^9.1.12"
   },
   "scripts": {
     "start": "react-scripts start",
