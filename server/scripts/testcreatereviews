@@ -1,0 +1,49 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
+const Review = require('../models/Review'); // adjust path if needed
+const User = require('../models/User');     // adjust path if needed
+const Track = require('../models/Track');   // adjust path if needed
+
+async function createSampleReviews() {
+  try {
+    // Connect to MongoDB (adjust your connection string)
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    // Replace these with actual user and track IDs from your database
+    const user1Id = '684eaaa8803cebf8d24e8d57'; 
+    const user2Id = '684eaaa8803cebf8d24e8d58';
+    const track1Id = '678b19c9f188e13a1e3082a6';
+    const track2Id = '67fb376a17c48c354a8bb6db';
+
+    // Create a positive review for user1 and track1
+    const positiveReview = new Review({
+      user: user1Id,
+      track: track1Id,
+      rating: 4.5,  // positive rating
+      content: "I really enjoyed this track! The melody is uplifting and well-produced."
+    });
+
+    // Create a negative review for user2 and track2
+    const negativeReview = new Review({
+      user: user2Id,
+      track: track2Id,
+      rating: 1.0,  // negative rating
+      content: "Didn’t resonate with me. Felt repetitive and uninspired."
+    });
+
+    await positiveReview.save();
+    await negativeReview.save();
+
+    console.log('Sample reviews created successfully.');
+
+    // Close connection when done
+    await mongoose.connection.close();
+  } catch (error) {
+    console.error('Error creating sample reviews:', error);
+  }
+}
+
+createSampleReviews();

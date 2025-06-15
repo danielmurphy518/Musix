@@ -1,4 +1,5 @@
 import React, { useContext } from "react";
+import { Link } from 'react-router-dom';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -8,40 +9,37 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import Container from '@mui/material/Container';
 import Button from '@mui/material/Button';
-import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import MusicNoteIcon from '@mui/icons-material/MusicNote';
 import PersonIcon from '@mui/icons-material/Person';
-import { Link } from 'react-router-dom';
-import { UserContext, logout} from '../UserContext';
+import { UserContext } from '../UserContext';
 
-const pages = ['Tracks', 'Members'];
+const pages = [
+  { label: 'Home', path: '/' },
+  { label: 'Network', path: '/network' },
+];
 
 function ResponsiveAppBar({ openLoginModal }) {
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
-
-  // Get user from context
-  const { user, logout } = useContext(UserContext); // Call inside component
-  console.log(user);
+  const { user, logout } = useContext(UserContext);
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
-  };
-
-  const handleOpenUserMenu = (event) => {
-    setAnchorElUser(event.currentTarget);
   };
 
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
 
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
 
-  // Placeholder logout function
   const handleLogout = () => {
     logout();
     handleCloseUserMenu();
@@ -49,164 +47,82 @@ function ResponsiveAppBar({ openLoginModal }) {
 
   return (
     <AppBar position="static" sx={{ backgroundColor: '#2f2f2f' }}>
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'center',
-          width: '100%',
-          backgroundColor: 'inherit',
-        }}
-      >
-        <Container
-          maxWidth={false}
-          sx={{
-            maxWidth: '950px',
-            width: '100%',
-            padding: '0 16px',
-          }}
-        >
-          <Toolbar disableGutters>
-            <MusicNoteIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
-            <Typography
-              variant="h6"
-              noWrap
-              component={Link}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: 'none', md: 'flex' },
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
+      <Container maxWidth="lg">
+        <Toolbar disableGutters>
+          <MusicNoteIcon sx={{ mr: 1 }} />
+          <Typography
+            variant="h6"
+            component={Link}
+            to="/"
+            sx={{
+              mr: 2,
+              fontFamily: 'monospace',
+              fontWeight: 700,
+              letterSpacing: '.3rem',
+              color: 'inherit',
+              textDecoration: 'none',
+            }}
+          >
+            Music App
+          </Typography>
+
+          {/* Navigation Buttons */}
+          <Box sx={{ flexGrow: 1, display: 'flex' }}>
+            {pages.map((page) => (
+              <Button
+                key={page.label}
+                component={Link}
+                to={page.path}
+                onClick={handleCloseNavMenu}
+                sx={{ color: 'white', display: 'block' }}
+              >
+                {page.label}
+              </Button>
+            ))}
+          </Box>
+
+          {/* User Menu */}
+          <Box sx={{ flexGrow: 0 }}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
+            </IconButton>
+
+            <Menu
+              sx={{ mt: '45px' }}
+              anchorEl={anchorElUser}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
+              anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+              transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
-              Music App
-            </Typography>
-
-            <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-              <IconButton
-                size="large"
-                aria-label="account of current user"
-                aria-controls="menu-appbar"
-                aria-haspopup="true"
-                onClick={handleOpenNavMenu}
-                color="inherit"
-              >
-                <MenuIcon />
-              </IconButton>
-              <Menu
-                id="menu-appbar"
-                anchorEl={anchorElNav}
-                anchorOrigin={{
-                  vertical: 'bottom',
-                  horizontal: 'left',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'left',
-                }}
-                open={Boolean(anchorElNav)}
-                onClose={handleCloseNavMenu}
-                sx={{ display: { xs: 'block', md: 'none' } }}
-              >
-                {pages.map((page) => (
-                  <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
-                  </MenuItem>
-                ))}
-              </Menu>
-            </Box>
-
-            <MusicNoteIcon sx={{ display: { xs: 'flex', md: 'none' }, mr: 1 }} />
-            <Typography
-              variant="h5"
-              noWrap
-              component={Link}
-              to="/"
-              sx={{
-                mr: 2,
-                display: { xs: 'flex', md: 'none' },
-                flexGrow: 1,
-                fontFamily: 'monospace',
-                fontWeight: 700,
-                letterSpacing: '.3rem',
-                color: 'inherit',
-                textDecoration: 'none',
-              }}
-            >
-              MAPP
-            </Typography>
-
-            <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-              {pages.map((page) => (
-                <Button
-                  key={page}
-                  onClick={handleCloseNavMenu}
-                  sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                  {page}
-                </Button>
-              ))}
-            </Box>
-
-            {/* User Menu */}
-            <Box sx={{ flexGrow: 0 }}>
-              <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
-              </IconButton>
-
-              <Menu
-                sx={{ mt: '45px' }}
-                id="menu-appbar"
-                anchorEl={anchorElUser}
-                anchorOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                keepMounted
-                transformOrigin={{
-                  vertical: 'top',
-                  horizontal: 'right',
-                }}
-                open={Boolean(anchorElUser)}
-                onClose={handleCloseUserMenu}
-              >
-                {/* Show Profile if logged in, otherwise show Login */}
-                {user ? (
-                  [
-                    <MenuItem
-                      key="profile"
-                      component={Link}
-                      to={`/user/${user._id}`}
-                      onClick={handleCloseUserMenu}
-                    >
-                      <Typography textAlign="center">Profile</Typography>
-                    </MenuItem>,
-                    <MenuItem
-                      key="logout"
-                      onClick={handleLogout}
-                    >
-                      <Typography textAlign="center">Logout</Typography>
-                    </MenuItem>,
-                  ]
-                ) : (
+              {user ? (
+                [
                   <MenuItem
-                    onClick={() => {
-                      openLoginModal(); // Open Login Modal if no user is logged in
-                      handleCloseUserMenu();
-                    }}
+                    key="profile"
+                    component={Link}
+                    to={`/user/${user._id}`}
+                    onClick={handleCloseUserMenu}
                   >
-                    <Typography textAlign="center">Login</Typography>
-                  </MenuItem>
-                )}
-              </Menu>
-            </Box>
-          </Toolbar>
-        </Container>
-      </Box>
+                    Profile
+                  </MenuItem>,
+                  <MenuItem key="logout" onClick={handleLogout}>
+                    Logout
+                  </MenuItem>,
+                ]
+              ) : (
+                <MenuItem
+                  onClick={() => {
+                    openLoginModal();
+                    handleCloseUserMenu();
+                  }}
+                >
+                  Login
+                </MenuItem>
+              )}
+            </Menu>
+          </Box>
+        </Toolbar>
+      </Container>
     </AppBar>
   );
 }

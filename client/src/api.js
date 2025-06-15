@@ -154,3 +154,17 @@ export const submitReview = async (trackId, content, rating, user) => {
 
   return response.json(); // Return the saved review data
 };
+
+export const fetchAllUsers = async () => {
+  try {
+    const response = await fetch(`${API_URL}/network/users-reviewed-same-tracks`); // <-- your route here
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    return [];
+  }
+};

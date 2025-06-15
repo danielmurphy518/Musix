@@ -1,28 +1,21 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Network } from "vis-network/standalone/esm/vis-network";
-import "vis-network/styles/vis-network.css"; // optional, for default styling
+import "vis-network/styles/vis-network.css";
+import { fetchAllUsers } from '../../api';  // Make sure this imports correctly
 
 const UserNetworkPage = () => {
   const containerRef = useRef(null);
+  const [network, setNetwork] = useState(null);
 
   useEffect(() => {
-    const nodes = [
-      { id: 1, label: "Alice" },
-      { id: 2, label: "Bob" },
-      { id: 3, label: "Carol" },
-      { id: 4, label: "Dave" },
-      { id: 5, label: "Eve" },
-    ];
-
-    const edges = [
-      { from: 1, to: 2 },
-      { from: 1, to: 3 },
-      { from: 2, to: 4 },
-      { from: 3, to: 4 },
-      { from: 4, to: 5 },
-    ];
-
-    const data = { nodes, edges };
+async function loadUsers() {
+  try {
+    const data = await fetchAllUsers(); // This returns { nodes: [...], edges: [...] }
+    
+    if (!data || !data.nodes) {
+      console.error("Invalid users data:", data);
+      return;
+    }
 
     const options = {
       nodes: {
@@ -35,21 +28,26 @@ const UserNetworkPage = () => {
       edges: {
         color: "#ccc",
         width: 2,
-        smooth: {
-          type: "continuous",
-        },
+        smooth: { type: "continuous" },
       },
-      physics: {
-        stabilization: false,
-      },
-      interaction: {
-        hover: true,
-        tooltipDelay: 100,
-      },
+      physics: { stabilization: false },
+      interaction: { hover: true, tooltipDelay: 100 },
     };
 
-    new Network(containerRef.current, data, options);
-  }, []);
+    if (network) {
+      network.setData(data);
+      network.redraw();
+    } else {
+      const net = new Network(containerRef.current, data, options);
+      setNetwork(net);
+    }
+  } catch (error) {
+    console.error("Error loading users:", error);
+  }
+}
+
+    loadUsers();
+  }, []); // Run once on mount
 
   return (
     <div style={{ padding: "2rem" }}>

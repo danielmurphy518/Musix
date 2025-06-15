@@ -32,6 +32,17 @@ const userSchema = new mongoose.Schema({
     },
     // You can add more fields here as needed
     // Example: total_ratings, last_review_date, etc.
+  },
+
+    interests: {
+    type: [String],
+    validate: {
+      validator: function (v) {
+        return v.length <= 5;
+      },
+      message: props => `A user can have at most 5 interests, but got ${props.value.length}`
+    },
+    default: []
   }
 });
 

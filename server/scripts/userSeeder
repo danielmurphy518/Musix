@@ -1,0 +1,61 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const User = require('../models/User'); // Adjust the path to your User model
+const { faker } = require('@faker-js/faker');
+
+// Define some example interests
+const possibleInterests = [
+  "Reading", "Cooking", "Traveling", "Photography", "Gaming",
+  "Hiking", "Swimming", "Painting", "Cycling", "Writing",
+  "Yoga", "Fishing", "Knitting", "Woodworking", "Gardening"
+];
+
+async function seedUsers() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    console.log('Connected to MongoDB');
+
+    // Optional: clear existing users first
+    await User.deleteMany({});
+    console.log('Cleared existing users');
+
+    const users = [];
+
+    for (let i = 0; i < 100; i++) {
+      const name = faker.name.findName();
+      const username = faker.internet.userName().toLowerCase() + i;
+      const email = faker.internet.email().toLowerCase();
+      const password = await bcrypt.hash('password123', 10); // same password for all
+      const activated = true;
+
+      // Pick 5 unique random interests
+      const interests = faker.helpers.shuffle(possibleInterests).slice(0, 5);
+
+      users.push({
+        name,
+        username,
+        email,
+        password,
+        activated,
+        interests,
+        data: {
+          review_count: faker.datatype.number({ min: 0, max: 20 }),
+        },
+      });
+    }
+
+    await User.insertMany(users);
+    console.log('Seeded 100 users with interests successfully!');
+    process.exit(0);
+  } catch (err) {
+    console.error('Error seeding users:', err);
+    process.exit(1);
+  }
+}
+
+seedUsers();

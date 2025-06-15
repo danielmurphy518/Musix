@@ -319,6 +319,83 @@ app.get('/user/:userId', async (req, res) => {
   }
 });
 
+app.get('/network/users-reviewed-same-tracks', async (req, res) => {
+  try {
+    // Step 1: Fetch all reviews, only user, track, and rating fields
+    const reviews = await Review.find({}, 'user track rating').lean();
+
+    // Step 2: Build a map: trackId -> array of { userId, rating }
+    const trackToUsers = {};
+    reviews.forEach(({ user, track, rating }) => {
+      const trackId = track.toString();
+      const userId = user.toString();
+
+      if (!trackToUsers[trackId]) {
+        trackToUsers[trackId] = [];
+      }
+      trackToUsers[trackId].push({ userId, rating });
+    });
+
+    // Step 3: Build edges between users who reviewed the same track,
+    // with color based on their ratings on that track
+    const edgesMap = new Map(); // key: "userId1-userId2", value: { from, to, color }
+
+    Object.values(trackToUsers).forEach((userRatings) => {
+      // For every unique pair of users, create/update an edge
+      for (let i = 0; i < userRatings.length; i++) {
+        for (let j = i + 1; j < userRatings.length; j++) {
+          const userA = userRatings[i];
+          const userB = userRatings[j];
+
+          // Determine edge key (sorted to avoid duplicates)
+          const [id1, id2] = [userA.userId, userB.userId].sort();
+          const edgeKey = `${id1}-${id2}`;
+
+          // Determine color for this pair on this track:
+          // Green if both positive (>=3), Red if both negative (<3), else skip
+          const bothPositive = userA.rating >= 3 && userB.rating >= 3;
+          const bothNegative = userA.rating < 3 && userB.rating < 3;
+
+          // We only care about edges where both are positive or both are negative
+          if (!bothPositive && !bothNegative) continue;
+
+          // Color for this pair's edge
+          const color = bothPositive ? 'green' : 'red';
+
+          // If edge exists, we want to update color if green (priority to green)
+          if (edgesMap.has(edgeKey)) {
+            const existing = edgesMap.get(edgeKey);
+            // Upgrade red edge to green if this track shows green condition
+            if (color === 'green' && existing.color !== 'green') {
+              existing.color = 'green';
+              edgesMap.set(edgeKey, existing);
+            }
+          } else {
+            // Add new edge
+            edgesMap.set(edgeKey, { from: id1, to: id2, color });
+          }
+        }
+      }
+    });
+
+    // Step 4: Prepare edges array for graph
+    const edges = Array.from(edgesMap.values());
+
+    // Step 5: Fetch all users (nodes), even if no edges
+    const allUserIds = await User.find({}).select('name username').lean();
+
+    // Step 6: Build nodes array for graph
+    const nodes = allUserIds.map((u) => ({
+      id: u._id.toString(),
+      label: u.name || u.username || 'Unknown',
+    }));
+
+    res.json({ nodes, edges });
+  } catch (err) {
+    console.error('Error building network graph:', err);
+    res.status(500).json({ error: 'Failed to build network graph' });
+  }
+});
 //this is extremely dangerous and should never be used, ever.
 app.delete('/reviews', async (req, res) => {
   try {
