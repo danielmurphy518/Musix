@@ -1,0 +1,43 @@
+require('dotenv').config();
+const mongoose = require('mongoose');
+const Review = require('../models/Review');
+const User = require('../models/User');
+const Track = require('../models/Track');
+const { faker } = require('@faker-js/faker'); // Make sure this is installed!
+
+async function createRandomReviews() {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+
+    const track1Id = '678b19c9f188e13a1e3082a6';
+    const track2Id = '67fb376a17c48c354a8bb6db';
+
+    // Grab all users (or a subset if you want)
+    const users = await User.find().limit(50); // change limit as needed
+
+    for (const user of users) {
+      const track = Math.random() < 0.5 ? track1Id : track2Id;
+        const rating = Math.floor(Math.random() * 11) * 0.5; // 0.0, 0.5, ..., 5.0      
+        const content = faker.lorem.sentences(Math.floor(Math.random() * 3) + 1);
+
+      const review = new Review({
+        user: user._id,
+        track,
+        rating,
+        content
+      });
+
+      await review.save();
+    }
+
+    console.log('Random reviews created successfully.');
+    await mongoose.connection.close();
+  } catch (error) {
+    console.error('Error creating random reviews:', error);
+  }
+}
+
+createRandomReviews();
