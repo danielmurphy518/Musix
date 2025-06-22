@@ -23,3 +23,7 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+spotipy_load/.cache
+spotipy_load/__pycache__/
+spotipy_load/venv/
