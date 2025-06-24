@@ -43,7 +43,12 @@ const userSchema = new mongoose.Schema({
       message: props => `A user can have at most 5 interests, but got ${props.value.length}`
     },
     default: []
-  }
+  },
+
+    bio: {
+    type: String,
+    default: ''
+  },
 });
 
 // Create the User model from the schema

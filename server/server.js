@@ -299,7 +299,7 @@ app.get('/user/:userId', async (req, res) => {
 
   try {
     // Find the user by their ID and select only the fields we want (name, username)
-    const user = await User.findById(userId).select('name username');
+    const user = await User.findById(userId).select('name username bio');
     
     // If no user is found, return a 404 response
     if (!user) {
