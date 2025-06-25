@@ -53,9 +53,10 @@ const UserPage = () => {
         </div>
       </div>
 
-<p className="user-bio">
-  {user.bio ? user.bio : "No bio provided."}
-</p>
+<div className="user-bio-box">
+  <h3>Bio</h3>
+  <p>{user.bio ? user.bio : "No bio provided."}</p>
+</div>
 
       {/* Reviews Section */}
       <div className="reviews-section">
