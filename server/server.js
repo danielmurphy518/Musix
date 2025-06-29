@@ -396,6 +396,104 @@ app.get('/network/users-reviewed-same-tracks', async (req, res) => {
     res.status(500).json({ error: 'Failed to build network graph' });
   }
 });
+
+
+app.get('/network/user-links/:userId', async (req, res) => {
+  try {
+    const userId = req.params.userId;
+    // Step 1: Fetch all reviews
+    const reviews = await Review.find({}, 'user track rating').lean();
+    // Step 2: Build trackId -> [{ userId, rating }]
+    const trackToUsers = {};
+    reviews.forEach(({ user, track, rating }) => {
+      const tId = track.toString();
+      const uId = user.toString();
+      if (!trackToUsers[tId]) trackToUsers[tId] = [];
+      trackToUsers[tId].push({ userId: uId, rating });
+    });
+    // Step 3: Create user-user edges
+    const edgesMap = new Map();
+    Object.values(trackToUsers).forEach((userRatings) => {
+      for (let i = 0; i < userRatings.length; i++) {
+        for (let j = i + 1; j < userRatings.length; j++) {
+          const a = userRatings[i];
+          const b = userRatings[j];
+          const [id1, id2] = [a.userId, b.userId].sort();
+          const edgeKey = `${id1}-${id2}`;
+          const bothPositive = a.rating >= 3 && b.rating >= 3;
+          const bothNegative = a.rating < 3 && b.rating < 3;
+          if (!bothPositive && !bothNegative) continue;
+          const color = bothPositive ? 'green' : 'red';
+          if (edgesMap.has(edgeKey)) {
+            const existing = edgesMap.get(edgeKey);
+            if (color === 'green' && existing.color !== 'green') {
+              existing.color = 'green';
+              edgesMap.set(edgeKey, existing);
+            }
+          } else {
+            edgesMap.set(edgeKey, { from: id1, to: id2, color });
+          }
+        }
+      }
+    });
+    const edges = Array.from(edgesMap.values());
+    // Step 4: Find user links
+    const positiveIds = new Set();
+    const negativeIds = new Set();
+    edges.forEach(({ from, to, color }) => {
+      if (from === userId) {
+        color === 'green' ? positiveIds.add(to) : negativeIds.add(to);
+      } else if (to === userId) {
+        color === 'green' ? positiveIds.add(from) : negativeIds.add(from);
+      }
+    });
+    const allLinkedUserIds = Array.from(new Set([...positiveIds, ...negativeIds]));
+    // Step 5: Fetch linked users and interests
+    const users = await User.find({ _id: { $in: allLinkedUserIds } })
+      .select('interests')
+      .lean();
+    const usersMap = Object.fromEntries(users.map(u => [u._id.toString(), u]));
+    const positiveUsers = Array.from(positiveIds).map(id => usersMap[id]).filter(Boolean);
+    const negativeUsers = Array.from(negativeIds).map(id => usersMap[id]).filter(Boolean);
+    // Step 6: Count interests by sentiment
+    const interestScores = {};
+    const countInterests = (users, direction) => {
+      const delta = direction === 'positive' ? 1 : -1;
+      users.forEach(user => {
+        (user.interests || []).forEach(interest => {
+          const key = interest.trim().toLowerCase();
+          interestScores[key] = (interestScores[key] || 0) + delta;
+        });
+      });
+    };
+    countInterests(positiveUsers, 'positive');
+    countInterests(negativeUsers, 'negative');
+    const allInterests = Object.entries(interestScores)
+      .map(([interest, net_score]) => ({ interest, net_score }))
+      .filter(i => i.net_score !== 0);
+    // Step 7: Sort top +ve and -ve
+    const topPositiveInterests = allInterests
+      .filter(i => i.net_score > 0)
+      .sort((a, b) => b.net_score - a.net_score)
+      .slice(0, 5);
+    const topNegativeInterests = allInterests
+      .filter(i => i.net_score < 0)
+      .sort((a, b) => a.net_score - b.net_score)
+      .slice(0, 5);
+    // Step 8: Return final result
+    res.json({
+      userId,
+      top_positive_interests: topPositiveInterests,
+      top_negative_interests: topNegativeInterests
+    });
+  } catch (err) {
+    console.error('Error building interest score:', err);
+    res.status(500).json({ error: 'Failed to analyze user interest sentiment' });
+  }
+});
+
+
+
 //this is extremely dangerous and should never be used, ever.
 app.delete('/reviews', async (req, res) => {
   try {
