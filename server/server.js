@@ -138,11 +138,9 @@ app.post('/login', async (req, res) => {
 
 // Route to get user information (protected)
 app.get('/user', async (req, res) => {
-  console.log("working?")
   const token = req.headers.authorization?.split(' ')[1];  // Extract the token from the Authorization header
 
   if (!token) {
-    console.log("return")
     return res.json(null);  // Return null if no token is provided
   }
 
@@ -155,7 +153,6 @@ app.get('/user', async (req, res) => {
     if (!user) {
       return res.json(null);  // Return null if the user is not found
     }
-    console.log(user)
     res.json(user);
   } catch (err) {
     console.error('Error fetching user info:', err);
@@ -272,7 +269,7 @@ app.get('/reviews/user/:userId', async (req, res) => {
     const { userId } = req.params;
     const userReviews = await Review.find({ user: userId })
       .populate('track', 'track_name artist') // Populate track details
-      .populate('user', 'username'); // Populate user details
+      .populate('user', 'username', 'interests'); // Populate user details
     res.json(userReviews);
   } catch (err) {
     console.error('Error fetching user reviews:', err);
@@ -295,11 +292,12 @@ app.get('/reviews/track/:trackId', async (req, res) => {
 });
 
 app.get('/user/:userId', async (req, res) => {
+  console.log("this called?")
   const { userId } = req.params;
 
   try {
     // Find the user by their ID and select only the fields we want (name, username)
-    const user = await User.findById(userId).select('name username bio');
+    const user = await User.findById(userId).select('name username bio interests');
     
     // If no user is found, return a 404 response
     if (!user) {

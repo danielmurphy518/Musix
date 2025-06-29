@@ -168,3 +168,16 @@ export const fetchAllUsers = async () => {
     return [];
   }
 };
+export const fetchImpliedInterests = async (userId) => {
+  try {
+    const response = await fetch(`${API_URL}/network/user-links/${userId}`);
+    if (!response.ok) {
+      throw new Error('Failed to fetch user links and interests');
+    }
+    const data = await response.json();
+    return data;
+  } catch (err) {
+    console.error('Error fetching user links and interests:', err);
+    return null;
+  }
+};
