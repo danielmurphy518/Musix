@@ -78,11 +78,3 @@ def get_playlist_tracks(playlist_id):
             break
 
     return tracks
-#def 
-# Example usage
-# save_track_to_mongo(
-#    "3n3Ppam7vgaVa1iaRUc9Lp",  # track ID
-#    MONGO_URI,
-#    "test",
-#    "tracks"
-# )
