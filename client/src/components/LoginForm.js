@@ -1,6 +1,7 @@
 import React, { useState, useContext } from 'react';
-import { UserContext } from '../UserContext'; // Import the context
-import { loginUser, registerUser } from '../api'; // Import the loginUser and registerUser functions from api.js
+import { ClipLoader } from 'react-spinners'; // Spinner import
+import { UserContext } from '../UserContext';
+import { loginUser, registerUser } from '../api';
 
 const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
@@ -8,53 +9,53 @@ const LoginForm = ({ closeModal }) => {
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState(''); // State for handling errors
-  const [isLogin, setIsLogin] = useState(true); // State to toggle between login and sign-up
-  const [successMessage, setSuccessMessage] = useState(''); // State for success message
-  const { login } = useContext(UserContext); // Access the login function from context
+  const [error, setError] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
+  const [successMessage, setSuccessMessage] = useState('');
+  const [loading, setLoading] = useState(false); // Loading state
+  const { login } = useContext(UserContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(''); // Reset the error before each submission attempt
-    setSuccessMessage(''); // Reset the success message
+    setError('');
+    setSuccessMessage('');
+    setLoading(true);
 
     if (!isLogin && password !== confirmPassword) {
       setError('Passwords do not match.');
+      setLoading(false);
       return;
     }
 
     try {
       let data;
       if (isLogin) {
-        // Login logic
         data = await loginUser({ email, password });
       } else {
-        // Sign-up logic
         data = await registerUser({ username, email, password, name });
       }
-      console.log(data)
+
       if (data.token) {
-        localStorage.setItem('token', data.token); // Save token to localStorage
-        login(data.user); // Update context with the logged-in user's info
-        closeModal(); // Close the modal
-        window.location.reload(); // Reload the page to reflect changes
+        localStorage.setItem('token', data.token);
+        login(data.user);
+        closeModal();
+        window.location.reload();
       } else if (!isLogin && data.success) {
-        console.log("going here?????")
-        // If registration is successful but no token is returned
         setSuccessMessage('Thanks for signing up. Please check your email for steps to verify your account.');
-        setIsLogin(true); // Switch back to the login form
-        // Clear form fields
+        setIsLogin(true);
         setEmail('');
         setUsername('');
         setName('');
         setPassword('');
         setConfirmPassword('');
       } else {
-        setError(data.message || 'Something went wrong. Please try again.'); // Set error message
+        setError(data.message || 'Something went wrong. Please try again.');
       }
     } catch (err) {
       console.error('Error:', err);
       setError('An error occurred. Please try again later.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -62,7 +63,6 @@ const LoginForm = ({ closeModal }) => {
     <form onSubmit={handleSubmit} style={formStyles}>
       <h2 style={headingStyles}>{isLogin ? 'Login' : 'Sign Up'}</h2>
 
-      {/* Name Field (only for Sign Up) */}
       {!isLogin && (
         <input
           type="text"
@@ -74,7 +74,6 @@ const LoginForm = ({ closeModal }) => {
         />
       )}
 
-      {/* Username Field (only for Sign Up) */}
       {!isLogin && (
         <input
           type="text"
@@ -86,7 +85,6 @@ const LoginForm = ({ closeModal }) => {
         />
       )}
 
-      {/* Email Field */}
       <input
         type="email"
         value={email}
@@ -96,7 +94,6 @@ const LoginForm = ({ closeModal }) => {
         style={inputStyles}
       />
 
-      {/* Password Field */}
       <input
         type="password"
         value={password}
@@ -106,7 +103,6 @@ const LoginForm = ({ closeModal }) => {
         style={inputStyles}
       />
 
-      {/* Confirm Password Field (only for Sign Up) */}
       {!isLogin && (
         <input
           type="password"
@@ -118,33 +114,39 @@ const LoginForm = ({ closeModal }) => {
         />
       )}
 
-      {/* Conditionally display error message with inline styling */}
       {error && (
-        <h3 style={{ 
-          color: 'red', 
-          fontSize: '14px', 
-          textAlign: 'center', 
-          marginBottom: '16px' 
+        <h3 style={{
+          color: 'red',
+          fontSize: '14px',
+          textAlign: 'center',
+          marginBottom: '16px'
         }}>
           {error}
         </h3>
       )}
 
-      {/* Conditionally display success message with inline styling */}
       {successMessage && (
-        <h3 style={{ 
-          color: 'green', 
-          fontSize: '14px', 
-          textAlign: 'center', 
-          marginBottom: '16px' 
+        <h3 style={{
+          color: 'green',
+          fontSize: '14px',
+          textAlign: 'center',
+          marginBottom: '16px'
         }}>
           {successMessage}
         </h3>
       )}
 
-      <button type="submit" style={buttonStyles}>
-        {isLogin ? 'Login' : 'Sign Up'}
+      {/* Submit Button */}
+      <button type="submit" style={buttonStyles} disabled={loading}>
+        {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
       </button>
+
+      {/* Spinner */}
+      {loading && (
+        <div style={{ marginTop: '10px' }}>
+          <ClipLoader color="#007BFF" size={35} />
+        </div>
+      )}
 
       {/* Toggle between Login and Sign Up */}
       <p style={toggleTextStyles}>
@@ -152,9 +154,9 @@ const LoginForm = ({ closeModal }) => {
         <span
           style={toggleLinkStyles}
           onClick={() => {
-            setIsLogin(!isLogin); // Toggle between login and sign-up
-            setError(''); // Clear any existing errors
-            setSuccessMessage(''); // Clear any success messages
+            setIsLogin(!isLogin);
+            setError('');
+            setSuccessMessage('');
           }}
         >
           {isLogin ? 'Sign Up' : 'Login'}
@@ -164,7 +166,7 @@ const LoginForm = ({ closeModal }) => {
   );
 };
 
-// Styles (unchanged)
+// Styles
 const formStyles = {
   display: 'flex',
   flexDirection: 'column',
