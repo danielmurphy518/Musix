@@ -63,7 +63,7 @@ function ResponsiveAppBar({ openLoginModal }) {
               textDecoration: 'none',
             }}
           >
-            Music App
+            Vibefiyah
           </Typography>
 
           {/* Navigation Buttons */}

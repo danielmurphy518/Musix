@@ -71,7 +71,7 @@ app.post('/register', async (req, res) => {
     // Send activation email
     await sendEmail(
       newUser.email,
-      'Activate your Music App account',
+      'Activate your Vibefiyah account',
       'complete_signup',  // your template file without extension, e.g., signup.html
       {
         name: newUser.name,
