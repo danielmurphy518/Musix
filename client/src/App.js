@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
 import Homepage from "./components/Homepage/Homepage";
@@ -10,90 +10,78 @@ import LoginForm from "./components/LoginForm";
 import VerifyPage from "./components/Verifypage/Verifypage";
 import Modal from "./components/Modal/Modal";
 import ResponsiveAppBar from "./components/ResponsiveAppBar";
-import UserNetworkPage from "./components/Network/Networkgraph"
+import UserNetworkPage from "./components/Network/Networkgraph";
 import "./App.css";
 import { UserProvider } from "./UserContext";
-
-
-const App = () => {
-    // const [user, setUser] = useState(null);
+const AppContent = () => {
     const [accessGranted, setAccessGranted] = useState(
         localStorage.getItem("accessGranted") === "true"
     );
     const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-
-    // useEffect(() => {
-    //     const token = localStorage.getItem("token");
-    //     if (token) {
-    //         getUserInfo(token);
-    //     }
-    // }, []);
-
-    // const getUserInfo = async (token) => {
-    //     try {
-    //         const response = await fetch("http://localhost:5000/user", {
-    //             headers: {
-    //                 Authorization: `Bearer ${token}`,
-    //             },
-    //         });
-    //         const data = await response.json();
-    //         setUser(data);
-    //     } catch (error) {
-    //         console.error("Error fetching user data:", error);
-    //     }
-    // };
-
+    const [serverOnline, setServerOnline] = useState(true);
     const handleLogin = (token) => {
         localStorage.setItem("token", token);
         setIsLoginModalOpen(false);
     };
-
     const handleLogout = () => {
         localStorage.removeItem("token");
     };
-
     const openLoginModal = () => {
         setIsLoginModalOpen(true);
     };
-
     const closeLoginModal = () => {
         setIsLoginModalOpen(false);
     };
-
+    // Check backend connection
+    useEffect(() => {
+        const checkBackend = async () => {
+            try {
+                const res = await fetch("http://localhost:4000/ping");
+                if (!res.ok) throw new Error("Bad response");
+                setServerOnline(true);
+            } catch (err) {
+                console.error("Backend not reachable:", err.message);
+                setServerOnline(false);
+            }
+        };
+        checkBackend();
+    }, []);
     if (!accessGranted) {
         return <PasswordPrompt onAccessGranted={() => setAccessGranted(true)} />;
     }
-
     return (
-        <UserProvider>
-            <Router>
-                <div>
-                    {/* Pass user and openLoginModal to ResponsiveAppBar */}
-                    <ResponsiveAppBar
-                        
-                        handleLogout={handleLogout}
-                        openLoginModal={openLoginModal}
-                    />
-                    <div className="content-wrapper">
-                        <Routes>
-                            <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
-                            <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
-                            <Route path="/track/:trackId" element={<TrackPage />} />
-                            <Route path="/user/:userId" element={<UserPage />} />
-                            <Route path="/login" element={<Login />} />
-                            <Route path="/signup" element={<Signup />} />
-                            <Route path="/verify/:token" element={<VerifyPage />} />
-                            <Route path="/network" element={<UserNetworkPage />} />                         
-                        </Routes>
-                    </div>
-                    {/* Login Modal */}
-                    <Modal isOpen={isLoginModalOpen} closeModal={closeLoginModal}>
-                        <LoginForm closeModal={closeLoginModal} />
-                    </Modal>
+        <div>
+            {!serverOnline && (
+                <div style={{ backgroundColor: "red", color: "white", padding: "1rem", textAlign: "center" }}>
+                    🚫 Can't connect to server. Some features may not work.
                 </div>
-            </Router>
-        </UserProvider>
+            )}
+            <ResponsiveAppBar
+                handleLogout={handleLogout}
+                openLoginModal={openLoginModal}
+            />
+            <div className="content-wrapper">
+                <Routes>
+                    <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
+                    <Route path="/track/:trackId" element={<TrackPage />} />
+                    <Route path="/user/:userId" element={<UserPage />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/verify/:token" element={<VerifyPage />} />
+                    <Route path="/network" element={<UserNetworkPage />} />
+                </Routes>
+            </div>
+            <Modal isOpen={isLoginModalOpen} closeModal={closeLoginModal}>
+                <LoginForm closeModal={closeLoginModal} />
+            </Modal>
+        </div>
     );
 };
-
+const App = () => (
+    <UserProvider>
+        <Router>
+            <AppContent />
+        </Router>
+    </UserProvider>
+);
 export default App;

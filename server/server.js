@@ -623,6 +623,10 @@ app.get('/verify/:userId', async (req, res) => {
   }
 });
 
+app.get('/ping', (req, res) => {
+  res.send('pong')
+});
+
 // Start the server
 //An error here likely is linked to Mongo Credentials
 app.listen(port, () => {

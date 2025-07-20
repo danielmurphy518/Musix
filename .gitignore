@@ -27,3 +27,8 @@ yarn-error.log*
 spotipy_load/.cache
 spotipy_load/__pycache__/
 spotipy_load/venv/
+/server/node_modules
+/server/node_modules
+/server/node_modules
+/server/node_modules/mongodb
+/server/node_modules
