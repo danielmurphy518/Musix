@@ -40,7 +40,7 @@ const Homepage = ({ openLoginModal }) => {
         >
           <div className="background-overlay">
             <div className="welcome-text">
-              <h1>Vibefiyah</h1>
+              <h1>Music App</h1>
               <p>
                 Discover and explore your favorite tracks, all in one place. TODO: think
                 of a better name for this
