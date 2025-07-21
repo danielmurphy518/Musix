@@ -32,3 +32,4 @@ spotipy_load/venv/
 /server/node_modules
 /server/node_modules/mongodb
 /server/node_modules
+/server/node_modules
