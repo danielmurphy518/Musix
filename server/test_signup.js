@@ -5,12 +5,10 @@ const templateData = {
   verificationLink: "http://localhost:4000/verify?token=abc123", // Replace with the actual verification link
 };
 
-// Email details
 const to = "daniel.murphyx@gmail.com"; // Replace with the recipient's email address
 const subject = "Welcome to MUSIC APP - Complete Your Registration";
 const templateName = "welcome"; // Name of the template file without the .html extension
 
-// Send the email
 sendEmail(to, subject, templateName, templateData)
   .then(info => {
     console.log("Email sent successfully:", info.response);
