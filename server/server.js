@@ -71,7 +71,7 @@ app.post('/register', async (req, res) => {
     // Send activation email
     await sendEmail(
       newUser.email,
-      'Activate your Vibefiyah account',
+      'Activate your Music App account',
       'complete_signup',  // your template file without extension, e.g., signup.html
       {
         name: newUser.name,
@@ -621,6 +621,10 @@ app.get('/verify/:userId', async (req, res) => {
     console.error('Error activating user:', error);
     res.status(500).send('Internal server error');
   }
+});
+
+app.get('/ping', (req, res) => {
+  res.send('pong')
 });
 
 // Start the server
