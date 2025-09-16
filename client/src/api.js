@@ -69,16 +69,16 @@ export const fetchFeaturedTrack = async () => {
   }
 };
 
-export const fetchReviewsByTrackId = async (trackId) => {
+export const fetchReviewsByTrackId = async (trackId, page = 1) => {
     try {
-      const response = await fetch(`${API_URL}/reviews/track/${trackId}`);
+      const response = await fetch(`${API_URL}/reviews/track/${trackId}?page=${page}`);
       if (!response.ok) {
-        throw new Error('Track not found');
+        throw new Error('Reviews not found');
       }
       const data = await response.json();
       return data;
     } catch (err) {
-      console.error('Error fetching track by ID:', err);
+      console.error('Error fetching reviews by track ID:', err);
       return null;
     }
 };

@@ -281,10 +281,29 @@ app.get('/reviews/user/:userId', async (req, res) => {
 app.get('/reviews/track/:trackId', async (req, res) => {
   try {
     const { trackId } = req.params;
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = 5; // Set to 5 for testing
+    const skip = (page - 1) * limit;
+
+    const totalReviews = await Review.countDocuments({ track: trackId });
+
     const trackReviews = await Review.find({ track: trackId })
       .populate('track', 'track_name artist id') // Populate track details
-      .populate('user', 'username name'); // Populate user details
-    res.json(trackReviews);
+      .populate('user', 'username name') // Populate user details
+      .sort({ _id: -1 }) // Sort by most recent
+      .skip(skip)
+      .limit(limit);
+
+    const responseData = {
+      reviews: trackReviews,
+      currentPage: page,
+      totalPages: Math.ceil(totalReviews / limit),
+    };
+
+    // Log the results to the server console
+    console.log('Fetched track reviews:', JSON.stringify(responseData, null, 2));
+
+    res.json(responseData);
   } catch (err) {
     console.error('Error fetching track reviews:', err);
     res.status(500).json({ message: 'Error fetching track reviews' });

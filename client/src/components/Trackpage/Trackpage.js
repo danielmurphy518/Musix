@@ -25,6 +25,7 @@ const TrackPage = () => {
           fetchReviewsByTrackId(trackId),
         ]);
         if (trackData) setTrack(trackData);
+        console.log(reviewData)
         if (reviewData) setReviews(reviewData);
       } catch (error) {
         console.error('Error fetching track or reviews:', error);
