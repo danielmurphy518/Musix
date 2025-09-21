@@ -69,6 +69,27 @@ export const fetchFeaturedTrack = async () => {
   }
 };
 
+export const fetchUserReviewByTrackId = async (trackId) => {
+    const token = localStorage.getItem('token');
+    if (!token) return null; // No user is logged in, so no review exists.
+
+    try {
+      const response = await fetch(`${API_URL}/reviews/userreview/${trackId}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Reviews not found');
+      }
+      const data = await response.json();
+      return data;
+    } catch (err) {
+      console.error('Error fetching user review by track ID:', err);
+      return null;
+    }
+};
+
 export const fetchReviewsByTrackId = async (trackId, page = 1) => {
     try {
       const response = await fetch(`${API_URL}/reviews/track/${trackId}?page=${page}`);
@@ -153,6 +174,32 @@ export const submitReview = async (trackId, content, rating, user) => {
   }
 
   return response.json(); // Return the saved review data
+};
+
+export const deleteReview = async (reviewId) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Authentication required to delete a review.');
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/review/${reviewId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to delete review');
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('Error deleting review:', err);
+    throw err; // Re-throw to be handled by the component
+  }
 };
 
 export const fetchAllUsers = async () => {

@@ -264,6 +264,36 @@ app.post('/reviews', async (req, res) => {
   }
 });
 
+// Route to get the current user's review for a specific track
+app.get('/reviews/userreview/:trackId', async (req, res) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    // No user is logged in, so they can't have a review. Return null.
+    return res.json(null);
+  }
+
+  try {
+    const { trackId } = req.params;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    // Find a single review matching the logged-in user and the track
+    const review = await Review.findOne({ user: userId, track: trackId });
+
+    // This will return the review object if found, or null if not.
+    res.json(review);
+
+  } catch (err) {
+    // This will catch errors from jwt.verify (e.g., invalid token) or from the database.
+    console.error("Error fetching user's review by track ID:", err);
+    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+      return res.status(401).json({ message: 'Invalid or expired token' });
+    }
+    res.status(500).json({ message: 'Error fetching review' });
+  }
+});
+
 app.get('/reviews/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
