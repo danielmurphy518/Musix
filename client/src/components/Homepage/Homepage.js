@@ -55,7 +55,9 @@ const Homepage = ({ openLoginModal }) => {
             )}
           </div>
         </div>
-        <button onClick={openLoginModal} className="sign-up-button">Sign Up</button>
+        {!user && (
+          <button onClick={openLoginModal} className="homepage-signup-button">Sign Up</button>
+        )}
         <div className="grid-container">
           {tracks.map((track, index) => (
             <div key={track._id || index} className="grid-box">

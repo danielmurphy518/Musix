@@ -1,0 +1,26 @@
+/* src/theme.css */
+
+:root {
+  /* Color Palette */
+  --primary-color: #550011; /* Deep Crimson */
+  --accent-color: #FFB600; /* Imperial Yellow */
+  --accent-hover-color: #EAA500; /* Darker Yellow */
+  --secondary-color: #3B2D1E; /* Dark Wood Brown */
+  --ui-color: #B2A17F; /* Muted Tan */
+  --background-dark: #4c3f2a; /* Darker Tan for cards/boxes */
+  --text-color: #F5F5DC; /* Warm Off-White (Beige) */
+  --text-dark: #3B2D1E; /* Dark Brown for text on light backgrounds */
+
+  /* Status Colors */
+  --success-color: #689F38; /* Thematic Green */
+  --error-color: #D32F2F; /* Thematic Red */
+
+  /* UI Properties */
+  --border-radius-small: 4px;
+  --border-radius-medium: 8px;
+  --box-shadow-light: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --box-shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+  /* Fonts */
+  --font-family-sans-serif: Arial, sans-serif;
+}

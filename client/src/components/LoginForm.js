@@ -3,6 +3,7 @@ import { ClipLoader } from 'react-spinners'; // Spinner import
 import { UserContext } from '../UserContext';
 import { loginUser, registerUser } from '../api';
 
+import './forms.css'; // Import the new form styles
 const LoginForm = ({ closeModal }) => {
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
@@ -60,8 +61,8 @@ const LoginForm = ({ closeModal }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} style={formStyles}>
-      <h2 style={headingStyles}>{isLogin ? 'Login' : 'Sign Up'}</h2>
+    <form onSubmit={handleSubmit} className="form-container">
+      <h2 className="form-heading">{isLogin ? 'Login' : 'Sign Up'}</h2>
 
       {!isLogin && (
         <input
@@ -70,7 +71,7 @@ const LoginForm = ({ closeModal }) => {
           onChange={(e) => setName(e.target.value)}
           placeholder="Name"
           required
-          style={inputStyles}
+          className="form-input"
         />
       )}
 
@@ -81,7 +82,7 @@ const LoginForm = ({ closeModal }) => {
           onChange={(e) => setUsername(e.target.value)}
           placeholder="Username"
           required
-          style={inputStyles}
+          className="form-input"
         />
       )}
 
@@ -91,7 +92,7 @@ const LoginForm = ({ closeModal }) => {
         onChange={(e) => setEmail(e.target.value)}
         placeholder="Email"
         required
-        style={inputStyles}
+        className="form-input"
       />
 
       <input
@@ -100,7 +101,7 @@ const LoginForm = ({ closeModal }) => {
         onChange={(e) => setPassword(e.target.value)}
         placeholder="Password"
         required
-        style={inputStyles}
+        className="form-input"
       />
 
       {!isLogin && (
@@ -110,49 +111,39 @@ const LoginForm = ({ closeModal }) => {
           onChange={(e) => setConfirmPassword(e.target.value)}
           placeholder="Confirm Password"
           required
-          style={inputStyles}
+          className="form-input"
         />
       )}
 
       {error && (
-        <h3 style={{
-          color: 'red',
-          fontSize: '14px',
-          textAlign: 'center',
-          marginBottom: '16px'
-        }}>
+        <h3 className="form-message form-error">
           {error}
         </h3>
       )}
 
       {successMessage && (
-        <h3 style={{
-          color: 'green',
-          fontSize: '14px',
-          textAlign: 'center',
-          marginBottom: '16px'
-        }}>
+        <h3 className="form-message form-success">
           {successMessage}
         </h3>
       )}
 
       {/* Submit Button */}
-      <button type="submit" style={buttonStyles} disabled={loading}>
+      <button type="submit" className="form-button" disabled={loading}>
         {loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
       </button>
 
       {/* Spinner */}
       {loading && (
         <div style={{ marginTop: '10px' }}>
-          <ClipLoader color="#007BFF" size={35} />
+          <ClipLoader color="var(--accent-color)" size={35} />
         </div>
       )}
 
       {/* Toggle between Login and Sign Up */}
-      <p style={toggleTextStyles}>
+      <p className="form-toggle-text">
         {isLogin ? "Don't have an account? " : "Already have an account? "}
         <span
-          style={toggleLinkStyles}
+          className="form-toggle-link"
           onClick={() => {
             setIsLogin(!isLogin);
             setError('');
@@ -164,53 +155,6 @@ const LoginForm = ({ closeModal }) => {
       </p>
     </form>
   );
-};
-
-// Styles
-const formStyles = {
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  gap: '16px',
-  padding: '20px',
-};
-
-const headingStyles = {
-  color: '#F0F0F0',
-  marginBottom: '16px',
-  textAlign: 'center',
-};
-
-const inputStyles = {
-  width: '100%',
-  maxWidth: '300px',
-  padding: '10px',
-  marginBottom: '16px',
-  border: '1px solid #ccc',
-  borderRadius: '4px',
-};
-
-const buttonStyles = {
-  padding: '10px 20px',
-  backgroundColor: '#007BFF',
-  color: '#fff',
-  border: 'none',
-  borderRadius: '4px',
-  cursor: 'pointer',
-  transition: 'background-color 0.3s',
-};
-
-const toggleTextStyles = {
-  color: '#F0F0F0',
-  fontSize: '14px',
-  textAlign: 'center',
-  marginTop: '10px',
-};
-
-const toggleLinkStyles = {
-  color: '#007BFF',
-  cursor: 'pointer',
-  textDecoration: 'underline',
 };
 
 export default LoginForm;

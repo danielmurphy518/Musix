@@ -46,7 +46,7 @@ function ResponsiveAppBar({ openLoginModal }) {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#2f2f2f' }}>
+    <AppBar position="static" sx={{ backgroundColor: 'var(--primary-color)', borderBottom: '2px solid var(--ui-color)' }}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <MusicNoteIcon sx={{ mr: 1 }} />
@@ -58,7 +58,7 @@ function ResponsiveAppBar({ openLoginModal }) {
               mr: 2,
               fontFamily: 'monospace',
               fontWeight: 700,
-              letterSpacing: '.3rem',
+              letterSpacing: '.2rem',
               color: 'inherit',
               textDecoration: 'none',
             }}
@@ -74,7 +74,7 @@ function ResponsiveAppBar({ openLoginModal }) {
                 component={Link}
                 to={page.path}
                 onClick={handleCloseNavMenu}
-                sx={{ color: 'white', display: 'block' }}
+                sx={{ color: 'var(--text-color)', display: 'block' }}
               >
                 {page.label}
               </Button>
@@ -84,7 +84,7 @@ function ResponsiveAppBar({ openLoginModal }) {
           {/* User Menu */}
           <Box sx={{ flexGrow: 0 }}>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-              <PersonIcon sx={{ color: 'white', fontSize: 32 }} />
+              <PersonIcon sx={{ color: 'var(--text-color)', fontSize: 32 }} />
             </IconButton>
 
             <Menu

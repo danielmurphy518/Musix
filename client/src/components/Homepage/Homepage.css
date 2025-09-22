@@ -9,15 +9,15 @@
 
 /* Welcome box styling */
 .welcome-box {
-  background-color: #4c3f2a; /* Similar color to the track boxes */
+  background-color: var(--background-dark);
   padding: 15px;
-  border-radius: 8px;
+  border-radius: var(--border-radius-medium);
   margin-bottom: 20px;
   font-size: 1.2em;
   font-weight: bold;
   text-align: center;
-  color: white; /* White text for contrast */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  color: var(--text-color);
+  box-shadow: var(--box-shadow-light);
 }
 
 /* Grid layout for boxes */
@@ -33,9 +33,9 @@
 .grid-box {
   width: 156px; /* Match image width */
   height: 231px; /* Match image height */
-  background-color: #b2a17f;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  background-color: var(--ui-color);
+  border-radius: var(--border-radius-medium);
+  box-shadow: var(--box-shadow-light);
   transition: transform 0.3s ease, background-color 0.3s ease;
   display: flex;
   justify-content: center;
@@ -44,7 +44,7 @@
 }
 
 .grid-box:hover {
-  background-color: #4c3f2a;
+  background-color: var(--background-dark);
   transform: scale(1.05);
 }
 
@@ -53,12 +53,12 @@
   width: 156px; /* Fixed width */
   height: 231px; /* Fixed height */
   object-fit: cover; /* Ensures the image fits without distortion */
-  border-radius: 4px; /* Slight rounding for aesthetics */
+  border-radius: var(--border-radius-small);
 }
 
 /* Placeholder text for missing images */
 .placeholder {
-  color: white;
+  color: var(--text-color);
   font-size: 14px;
   text-align: center;
 }
@@ -73,9 +73,9 @@
   background-image: url('https://i.scdn.co/image/ab67616d0000b27315ebbedaacef61af244262a8'); /* Replace with the actual image path */
   background-size: cover;
   background-position: center;
-  border-radius: 10px; /* Add rounded corners for a polished look */
+  border-radius: var(--border-radius-medium);
   overflow: hidden; /* Ensures child elements stay within the border */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Add a subtle shadow for depth */
+  box-shadow: var(--box-shadow-medium);
 }
 
 /* Overlay to make the image blend better */
@@ -101,7 +101,7 @@
 /* Centered text */
 .welcome-text {
   text-align: center;
-  color: white;
+  color: var(--text-color);
   z-index: 1;
 }
 
@@ -121,30 +121,31 @@
   bottom: 10px;
   right: 10px;
   font-size: 1rem;
-  color: #ddd;
+  color: var(--text-color);
   text-shadow: 1px 1px 2px black;
 }
 
-/* Green Sign Up Button */
-.sign-up-button {
-  background-color: #28a745; /* Green background */
-  color: white;
+/* Homepage Call-to-Action Button */
+.homepage-signup-button {
+  background-color: var(--accent-color);
+  color: var(--primary-color);
   padding: 15px 30px;
   font-size: 1.2rem;
   font-weight: bold;
   text-align: center;
   border: none;
-  border-radius: 8px;
+  border-radius: var(--border-radius-medium);
   cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  transition: background-color 0.3s ease;
+  box-shadow: var(--box-shadow-medium);
+  transition: background-color 0.3s ease, transform 0.2s ease;
   margin: 20px 0; /* Space above and below the button */
 }
 
-.sign-up-button:hover {
-  background-color: #218838; /* Darker green on hover */
+.homepage-signup-button:hover {
+  background-color: var(--accent-hover-color);
+  transform: translateY(-2px); /* Slight lift on hover */
 }
 
-.sign-up-button:focus {
+.homepage-signup-button:focus {
   outline: none; /* Remove default focus outline */
 }
