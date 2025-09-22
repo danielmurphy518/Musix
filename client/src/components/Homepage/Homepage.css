@@ -33,7 +33,7 @@
 .grid-box {
   width: 156px; /* Match image width */
   height: 231px; /* Match image height */
-  background-color: var(--ui-color);
+  background-color: #fff;
   border-radius: var(--border-radius-medium);
   box-shadow: var(--box-shadow-light);
   transition: transform 0.3s ease, background-color 0.3s ease;
