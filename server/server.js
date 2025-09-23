@@ -1,7 +1,7 @@
 // Import dependencies
 require('dotenv').config();
 const express = require('express');
-const mongoose = require('mongoose');
+const serverless = require('serverless-http');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');  // Import cors
@@ -10,32 +10,17 @@ const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
 const { sendEmail } = require("./send_email.js"); // Import the email service
 const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
+const { connectToDatabase } = require('./db'); // Import the new DB connector
 const app = express();
-const port = 4000;
-
-// MongoDB URI from .env
-const mongoURI = process.env.MONGO_URI;
 
 // CORS options
-
 const corsOptions = {
   origin: '*', // Allow all origins temporarily for debugging
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
   credentials: true,
 };
-
 app.use(cors(corsOptions));
-
-
-// Connect to MongoDB Atlas using Mongoose
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('Connected to MongoDB Atlas');
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-  });
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -66,7 +51,8 @@ app.post('/register', async (req, res) => {
 
     await newUser.save();
 
-    const verificationLink = `http://localhost:3000/verify/${newUser._id}`;
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const verificationLink = `${frontendUrl}/verify/${newUser._id}`;
 
     // Send activation email
     await sendEmail(
@@ -78,7 +64,6 @@ app.post('/register', async (req, res) => {
         verificationLink,
       }
     );
-
 
     res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
@@ -676,8 +661,22 @@ app.get('/ping', (req, res) => {
   res.send('pong')
 });
 
-// Start the server
-//An error here likely is linked to Mongo Credentials
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+// Wrap the app for serverless deployment
+const handler = serverless(app);
+
+// Export the handler for Serverless
+module.exports.handler = async (event, context) => {
+  // This allows the Lambda function to reuse the database connection
+  // across multiple invocations instead of closing it after each one.
+  context.callbackWaitsForEmptyEventLoop = false;
+
+  // Ensure the database is connected before processing the request
+  try {
+    await connectToDatabase();
+  } catch (error) {
+    console.error('Database connection failed:', error);
+    return { statusCode: 500, body: JSON.stringify({ message: 'Database connection failed' }) };
+  }
+
+  return await handler(event, context);
+};

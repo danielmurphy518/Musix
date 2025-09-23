@@ -1,0 +1,37 @@
+service: musix-api
+
+frameworkVersion: '^4.0.0'
+
+provider:
+  name: aws
+  runtime: nodejs18.x # Or a newer supported version
+  region: us-east-1 # Or your preferred AWS region
+  environment:
+    MONGO_URI: ${env:MONGO_URI}
+    JWT_SECRET: ${env:JWT_SECRET}
+    EMAIL_USER: ${env:EMAIL_USER}
+    EMAIL_PASSWORD: ${env:EMAIL_PASSWORD}
+    FRONTEND_URL: ${env:FRONTEND_URL, 'http://localhost:3000'} # Default for local, override for prod
+
+functions:
+  api:
+    handler: server.handler # Points to the exported handler in server.js
+    events:
+      - httpApi:
+          path: /{proxy+}
+          method: any
+
+plugins:
+  - serverless-offline
+
+package:
+  individually: true
+  exclude:
+    - ./**
+  include:
+    - server.js
+    - send_email.js
+    - services/**
+    - models/**
+    - templates/**
+    - node_modules/**
