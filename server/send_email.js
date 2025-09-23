@@ -1,7 +1,6 @@
 const nodemailer = require("nodemailer");
 const fs = require("fs");
 const path = require("path");
-require("dotenv").config();
 
 // Read email template file and replace placeholders
 const loadTemplate = (templateName, data) => {
