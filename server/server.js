@@ -8,13 +8,16 @@ const cors = require('cors');  // Import cors
 const User = require('./models/User');
 const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
-const { sendEmail } = require("./send_email.js"); // Import the email service
+
+//const { sendEmail } = require("./send_email.js"); // Import the email service
 const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
 const app = express();
 const port = 4000;
 
 // MongoDB URI from .env
 const mongoURI = process.env.MONGO_URI;
+console.log("=== Starting server.js ===");
+
 
 // CORS options
 
