@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:4000'; // Make sure this matches your backend URL
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
+
 
 // Register user
 export const registerUser = async (userData) => {
