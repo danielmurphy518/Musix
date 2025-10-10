@@ -13,6 +13,8 @@ import ResponsiveAppBar from "./components/ResponsiveAppBar";
 import UserNetworkPage from "./components/Network/Networkgraph";
 import "./App.css";
 import { UserProvider } from "./UserContext";
+
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:4000';
 const AppContent = () => {
     const [accessGranted, setAccessGranted] = useState(
         localStorage.getItem("accessGranted") === "true"
@@ -36,7 +38,7 @@ const AppContent = () => {
     useEffect(() => {
         const checkBackend = async () => {
             try {
-                const res = await fetch("http://localhost:4000/ping");
+                const res = await fetch(API_URL);
                 if (!res.ok) throw new Error("Bad response");
                 setServerOnline(true);
             } catch (err) {
