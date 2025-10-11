@@ -46,7 +46,7 @@ function ResponsiveAppBar({ openLoginModal }) {
   };
 
   return (
-    <AppBar position="static" sx={{ backgroundColor: '#2f2f2f' }}>
+    <AppBar position="static" sx={{ backgroundColor: '#be9b7b' }}>
       <Container maxWidth="lg">
         <Toolbar disableGutters>
           <MusicNoteIcon sx={{ mr: 1 }} />
@@ -63,7 +63,7 @@ function ResponsiveAppBar({ openLoginModal }) {
               textDecoration: 'none',
             }}
           >
-            Music App
+            Clusters
           </Typography>
 
           {/* Navigation Buttons */}
