@@ -38,7 +38,7 @@ const AppContent = () => {
     useEffect(() => {
         const checkBackend = async () => {
             try {
-                const res = await fetch(API_URL);
+                const res = await fetch(API_URL+'/ping');
                 if (!res.ok) throw new Error("Bad response");
                 setServerOnline(true);
             } catch (err) {

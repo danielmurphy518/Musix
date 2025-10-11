@@ -52,37 +52,21 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Email or username already exists' });
     }
-    let hashedpass = await bcrypt.hash(password, 10);
-    // Create a new user and save to the database
+
+    const hashedpass = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       username,
       email,
-      password: hashedpass,  // Storing plain password (no hashing),
-      activated: false
+      password: hashedpass,
+      activated: true // ✅ auto-activate since no email verification
     });
 
     await newUser.save();
-
-    const verificationLink = `http://localhost:3000/verify/${newUser._id}`;
-
-    // Send activation email
-    await sendEmail(
-      newUser.email,
-      'Activate your Music App account',
-      'complete_signup',  // your template file without extension, e.g., signup.html
-      {
-        name: newUser.name,
-        verificationLink,
-      }
-    );
-
-
     res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -295,7 +279,6 @@ app.get('/reviews/track/:trackId', async (req, res) => {
 });
 
 app.get('/user/:userId', async (req, res) => {
-  console.log("this called?")
   const { userId } = req.params;
 
   try {
