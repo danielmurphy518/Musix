@@ -41,7 +41,7 @@ const LoginForm = ({ closeModal }) => {
       } else if (!isLogin && data.success) {
         console.log("going here?????")
         // If registration is successful but no token is returned
-        setSuccessMessage('Thanks for signing up. Please check your email for steps to verify your account.');
+        setSuccessMessage('Thanks for signing up. You should be able to login now (hopefully)');
         setIsLogin(true); // Switch back to the login form
         // Clear form fields
         setEmail('');

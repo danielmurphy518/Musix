@@ -7,10 +7,17 @@ const cors = require('cors');  // Import cors
 const User = require('./models/User');
 const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
+
 const { sendEmail } = require("./send_email.js"); // Import the email service
 const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
 const { connectToDatabase } = require('./db'); // Import the new DB connector
 const app = express();
+const port = 4000;
+
+// MongoDB URI from .env
+const mongoURI = process.env.MONGO_URI;
+console.log("=== Starting server.js ===");
+
 
 // CORS options
 const corsOptions = {
@@ -33,37 +40,21 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    // Check if the user already exists
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ message: 'Email or username already exists' });
     }
-    let hashedpass = await bcrypt.hash(password, 10);
-    // Create a new user and save to the database
+
+    const hashedpass = await bcrypt.hash(password, 10);
     const newUser = new User({
       name,
       username,
       email,
-      password: hashedpass,  // Storing plain password (no hashing),
-      activated: false
+      password: hashedpass,
+      activated: true // ✅ auto-activate since no email verification
     });
 
     await newUser.save();
-
-    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-    const verificationLink = `${frontendUrl}/verify/${newUser._id}`;
-
-    // Send activation email
-    await sendEmail(
-      newUser.email,
-      'Activate your Music App account',
-      'complete_signup',  // your template file without extension, e.g., signup.html
-      {
-        name: newUser.name,
-        verificationLink,
-      }
-    );
-
     res.status(201).json({ success: true, message: 'User registered successfully' });
   } catch (err) {
     console.error('Error registering user:', err);
@@ -325,7 +316,6 @@ app.get('/reviews/track/:trackId', async (req, res) => {
 });
 
 app.get('/user/:userId', async (req, res) => {
-  console.log("this called?")
   const { userId } = req.params;
 
   try {
@@ -660,22 +650,8 @@ app.get('/ping', (req, res) => {
   res.send('pong')
 });
 
-// Wrap the app for serverless deployment
-const handler = serverless(app);
-
-// Export the handler for Serverless
-module.exports.handler = async (event, context) => {
-  // This allows the Lambda function to reuse the database connection
-  // across multiple invocations instead of closing it after each one.
-  context.callbackWaitsForEmptyEventLoop = false;
-
-  // Ensure the database is connected before processing the request
-  try {
-    await connectToDatabase();
-  } catch (error) {
-    console.error('Database connection failed:', error);
-    return { statusCode: 500, body: JSON.stringify({ message: 'Database connection failed' }) };
-  }
-
-  return await handler(event, context);
-};
+// Start the server
+//An error here likely is linked to Mongo Credentials
+app.listen(port, "0.0.0.0", () => {
+  console.log(`🚀 Server running at http://0.0.0.0:${port}`);
+});
