@@ -1,6 +1,7 @@
 // Import dependencies
+require('dotenv').config();
 const express = require('express');
-const serverless = require('serverless-http');
+const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');  // Import cors
@@ -10,7 +11,6 @@ const Review = require('./models/Review');
 
 const { sendEmail } = require("./send_email.js"); // Import the email service
 const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
-const { connectToDatabase } = require('./db'); // Import the new DB connector
 const app = express();
 const port = 4000;
 
@@ -20,13 +20,25 @@ console.log("=== Starting server.js ===");
 
 
 // CORS options
+
 const corsOptions = {
   origin: '*', // Allow all origins temporarily for debugging
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning'],
   credentials: true,
 };
+
 app.use(cors(corsOptions));
+
+
+// Connect to MongoDB Atlas using Mongoose
+mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log('Connected to MongoDB Atlas');
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+  });
 
 // Middleware to parse JSON request bodies
 app.use(express.json());
@@ -239,36 +251,6 @@ app.post('/reviews', async (req, res) => {
   }
 });
 
-// Route to get the current user's review for a specific track
-app.get('/reviews/userreview/:trackId', async (req, res) => {
-  const token = req.headers.authorization?.split(' ')[1];
-
-  if (!token) {
-    // No user is logged in, so they can't have a review. Return null.
-    return res.json(null);
-  }
-
-  try {
-    const { trackId } = req.params;
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const userId = decoded.userId;
-
-    // Find a single review matching the logged-in user and the track
-    const review = await Review.findOne({ user: userId, track: trackId });
-
-    // This will return the review object if found, or null if not.
-    res.json(review);
-
-  } catch (err) {
-    // This will catch errors from jwt.verify (e.g., invalid token) or from the database.
-    console.error("Error fetching user's review by track ID:", err);
-    if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-      return res.status(401).json({ message: 'Invalid or expired token' });
-    }
-    res.status(500).json({ message: 'Error fetching review' });
-  }
-});
-
 app.get('/reviews/user/:userId', async (req, res) => {
   try {
     const { userId } = req.params;
@@ -286,29 +268,10 @@ app.get('/reviews/user/:userId', async (req, res) => {
 app.get('/reviews/track/:trackId', async (req, res) => {
   try {
     const { trackId } = req.params;
-    const page = parseInt(req.query.page, 10) || 1;
-    const limit = 5; // Set to 5 for testing
-    const skip = (page - 1) * limit;
-
-    const totalReviews = await Review.countDocuments({ track: trackId });
-
     const trackReviews = await Review.find({ track: trackId })
       .populate('track', 'track_name artist id') // Populate track details
-      .populate('user', 'username name') // Populate user details
-      .sort({ _id: -1 }) // Sort by most recent
-      .skip(skip)
-      .limit(limit);
-
-    const responseData = {
-      reviews: trackReviews,
-      currentPage: page,
-      totalPages: Math.ceil(totalReviews / limit),
-    };
-
-    // Log the results to the server console
-    console.log('Fetched track reviews:', JSON.stringify(responseData, null, 2));
-
-    res.json(responseData);
+      .populate('user', 'username name'); // Populate user details
+    res.json(trackReviews);
   } catch (err) {
     console.error('Error fetching track reviews:', err);
     res.status(500).json({ message: 'Error fetching track reviews' });
