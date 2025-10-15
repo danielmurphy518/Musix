@@ -1,0 +1,74 @@
+/* Overall page */
+.clusters-container {
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem;
+  text-align: center;
+}
+
+/* Header */
+.clusters-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #f7f3ef; /* warm white */
+  margin-bottom: 0.5rem;
+}
+
+.clusters-subtitle {
+  color: #d6cfc4;
+  margin-bottom: 2.5rem;
+  max-width: 500px;
+}
+
+/* Card list */
+.clusters-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+/* Remove underline + inherit text color for links */
+.cluster-link {
+  text-decoration: none;
+  color: inherit;
+  width: 100%;
+  max-width: 600px;
+}
+
+/* Each card */
+.cluster-card {
+  background-color: #6b4f37; /* light brownish tone */
+  border: 2px solid transparent; /* clean default */
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.2rem;
+  width: 100%;
+  box-sizing: border-box;
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+/* Hover "highlight border" effect */
+.cluster-card:hover {
+  transform: scale(1.02);
+  border-color: #f5e0c8; /* soft beige highlight */
+  background-color: #7a5c41; /* slightly lighter on hover */
+}
+
+/* Card content */
+.cluster-name {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.cluster-desc {
+  color: #f0f0f0;
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+  line-height: 1.4;
+}

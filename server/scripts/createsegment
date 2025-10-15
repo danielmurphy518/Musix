@@ -1,0 +1,20 @@
+// scripts/createSegment.js
+require("dotenv").config();
+const mongoose = require("mongoose");
+const Segment = require("../models/Segment"); // adjust path if needed
+
+(async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI); // e.g. "mongodb+srv://..."
+    const seg = await Segment.create({
+      name: "Hustle Hypers",
+      description: "Adrenaline junkies chasing energy, flex and the next big night.",
+      users: [] // or [someUserObjectId]
+    });
+    console.log("Created Segment:", seg._id, seg.name);
+  } catch (err) {
+    console.error("Error:", err);
+  } finally {
+    await mongoose.disconnect();
+  }
+})();

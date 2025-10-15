@@ -8,6 +8,8 @@ const cors = require('cors');  // Import cors
 const User = require('./models/User');
 const Track = require('./models/Track');  // Import User model
 const Review = require('./models/Review');
+const Segment = require('./models/Segment');
+
 
 const { sendEmail } = require("./send_email.js"); // Import the email service
 const { clearReviews, clearUsers, clearAllData } = require('./services/clearData'); // Importing helper functions
@@ -608,6 +610,73 @@ app.get('/verify/:userId', async (req, res) => {
     res.status(500).send('Internal server error');
   }
 });
+
+// GET /tracks?offset=0&limit=25&sort=asc
+app.get('/segments', async (req, res) => {
+  console.log("this called???")
+  try {
+    // Parse & sanitize
+    const rawOffset = parseInt(req.query.offset, 10);
+    const rawLimit = parseInt(req.query.limit, 10);
+    const sortDir = (req.query.sort || 'asc').toLowerCase() === 'desc' ? -1 : 1;
+
+    const offset = Number.isFinite(rawOffset) && rawOffset >= 0 ? rawOffset : 0;
+    const limit = Math.min(
+      Number.isFinite(rawLimit) && rawLimit > 0 ? rawLimit : 25,
+      25 // hard cap at 25
+    );
+
+    // Optional filters (customize if needed)
+    // const { type, q } = req.query;
+    // const filter = {};
+    // if (type) filter.type = type;
+    // if (q) filter.name = { $regex: q, $options: 'i' };
+
+    const filter = {}; // no filters by default
+
+    // Fetch segments and count total
+    const [segments, total] = await Promise.all([
+      Segment.find(filter)
+        .sort({ _id: sortDir }) // stable sort for paging; use createdAt if available
+        .skip(offset)
+        .limit(limit)
+        .lean(),
+      Segment.countDocuments(filter),
+    ]);
+    console.log(segments)
+    res.json({
+      segments,
+      page: {
+        offset,
+        limit,
+        total,
+        hasMore: offset + segments.length < total,
+      },
+    });
+  } catch (err) {
+    console.error('Error fetching paginated segments:', err);
+    res.status(500).json({ message: 'Error fetching segments' });
+  }
+});
+
+app.get('/segment/:segmentId', async (req, res) => {
+  try {
+    const { segmentId } = req.params;
+    const segment = await Segment.findById(segmentId);
+    console.log(segment)
+
+    if (!segment) {
+      return res.status(404).json({ message: 'Segment not found' });
+    }
+
+    res.json(segment);
+  } catch (error) {
+    console.error('Error fetching segment:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
 
 app.get('/ping', (req, res) => {
   res.send('pong')

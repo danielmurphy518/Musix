@@ -11,6 +11,8 @@ import VerifyPage from "./components/Verifypage/Verifypage";
 import Modal from "./components/Modal/Modal";
 import ResponsiveAppBar from "./components/ResponsiveAppBar";
 import UserNetworkPage from "./components/Network/Networkgraph";
+import ClustersPage from "./components/Clusters/Clusters";
+import ClusterPage from "./components/Cluster/Cluster";
 import "./App.css";
 import { UserProvider } from "./UserContext";
 
@@ -66,11 +68,13 @@ const AppContent = () => {
                 <Routes>
                     <Route path="/" element={<Homepage openLoginModal={openLoginModal} />} />
                     <Route path="/track/:trackId" element={<TrackPage />} />
+                    <Route path="/cluster/:clusterId" element={<ClusterPage />} />
                     <Route path="/user/:userId" element={<UserPage />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/verify/:token" element={<VerifyPage />} />
                     <Route path="/network" element={<UserNetworkPage />} />
+                    <Route path="/clusters" element={<ClustersPage />} />
                 </Routes>
             </div>
             <Modal isOpen={isLoginModalOpen} closeModal={closeLoginModal}>

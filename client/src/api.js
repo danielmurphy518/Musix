@@ -56,13 +56,11 @@ export const fetchTrackById = async (trackId) => {
 
 export const fetchFeaturedTrack = async () => {
   try {
-    console.log("this called?")
     const response = await fetch(`${API_URL}/track/featured`);
     if (!response.ok) {
       throw new Error('Track not found');
     }
     const data = await response.json();
-    console.log(data)
     return data;
   } catch (err) {
     console.error('Error fetching track by ID:', err);
@@ -226,6 +224,36 @@ export const fetchImpliedInterests = async (userId) => {
     return data;
   } catch (err) {
     console.error('Error fetching user links and interests:', err);
+    return null;
+  }
+};
+
+export const fetchSegments = async (offset = 0, limit = 25) => {
+  try {
+    const response = await fetch(`${API_URL}/segments?offset=${offset}&limit=${limit}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch segments: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data; // expected: { segments: [...], totalCount: number }
+  } catch (error) {
+    console.error("Error fetching segments:", error);
+    return [];
+  }
+};
+
+
+export const fetchSegmentById = async (segmentId) => {
+  try {
+    console.log("this called?")
+    const response = await fetch(`${API_URL}/segment/${segmentId}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch cluster: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching cluster by ID:", error);
     return null;
   }
 };

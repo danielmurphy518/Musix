@@ -17,6 +17,7 @@ import { UserContext } from '../UserContext';
 const pages = [
   { label: 'Home', path: '/' },
   { label: 'Network', path: '/network' },
+  { label: 'Clusters', path: '/clusters' }
 ];
 
 function ResponsiveAppBar({ openLoginModal }) {
